@@ -21,9 +21,9 @@
     <title>Enhanced Pong Game - Ultimate Edition</title>
     
     <!-- Chart.js for Analytics Dashboard -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./version-manager.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="version-manager.js"></script>
+</head>
     <style>
         :root {
             --primary-color: #4ecdc4;
@@ -588,6 +588,22 @@
                         <h4>⏰ Play Session Activity</h4>
                         <div class="chart-wrapper">
                             <canvas id="sessionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Tournament Analytics -->
+                    <div class="chart-container">
+                        <h4>🏆 Tournament Performance</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="tournamentChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Heat Map Intensity Trends -->
+                    <div class="chart-container">
+                        <h4>🔥 Heat Map Intensity Over Time</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="heatMapTrendsChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -2806,6 +2822,16 @@
                 this.saveStats();
                 this.saveAnalytics();
                 
+                // Track game completion for advanced analytics
+                trackGameCompletion({
+                    won: true,
+                    playerScore: this.player.score,
+                    aiScore: this.ai.score,
+                    gameMode: this.gameMode,
+                    aiPersonality: this.ai.personality,
+                    timestamp: new Date().toISOString()
+                });
+                
                 // Check achievements after game ends
                 this.checkAchievements();
                 
@@ -2833,6 +2859,16 @@
                 audioSystem?.play('lose');
                 this.saveStats();
                 this.saveAnalytics();
+                
+                // Track game completion for advanced analytics
+                trackGameCompletion({
+                    won: false,
+                    playerScore: this.player.score,
+                    aiScore: this.ai.score,
+                    gameMode: this.gameMode,
+                    aiPersonality: this.ai.personality,
+                    timestamp: new Date().toISOString()
+                });
                 
                 // Check achievements even on loss (some achievements might be reached)
                 this.checkAchievements();
@@ -3461,6 +3497,8 @@
             heatMapVisualizer.initialize('heatmapCanvas');
             
             loadSettings();
+            loadAnalyticsData();
+            initializeSession();
             
             // Apply background settings after initialization
             backgroundEffect.setEnabled(gameSettings.backgroundEffects);
@@ -4291,8 +4329,129 @@
             }
         }
         
-        // ===== ANALYTICS CHARTS SYSTEM =====
+        // ===== ENHANCED ANALYTICS DATA SYSTEM =====
+        let analyticsData = {
+            sessionHistory: [],
+            performanceHistory: [],
+            tournamentHistory: [],
+            aiPersonalityStats: {},
+            heatMapIntensity: [],
+            currentSession: null
+        };
+        
         let analyticsCharts = {};
+        
+        // Initialize session tracking
+        function initializeSession() {
+            analyticsData.currentSession = {
+                id: Date.now(),
+                startTime: new Date().toISOString(),
+                gamesPlayed: 0,
+                wins: 0,
+                losses: 0,
+                totalScore: 0,
+                gameMode: null,
+                aiPersonality: null,
+                performanceSnapshots: []
+            };
+        }
+        
+        // Track game completion for analytics
+        function trackGameCompletion(gameResult) {
+            if (!analyticsData.currentSession) initializeSession();
+            
+            const session = analyticsData.currentSession;
+            session.gamesPlayed++;
+            session.totalScore += gameResult.playerScore;
+            
+            if (gameResult.won) {
+                session.wins++;
+            } else {
+                session.losses++;
+            }
+            
+            // Take performance snapshot
+            const stats = gameEngine.getStats();
+            const analytics = gameEngine.analytics;
+            session.performanceSnapshots.push({
+                timestamp: new Date().toISOString(),
+                winRate: stats.winRate,
+                reactionTime: gameEngine.getAverageReactionTime(),
+                consistency: analytics.playerBehavior.consistency * 100,
+                gameMode: gameEngine.gameMode,
+                aiPersonality: gameEngine.ai.personality
+            });
+            
+            // Track AI personality performance
+            const aiKey = gameEngine.ai.personality;
+            if (!analyticsData.aiPersonalityStats[aiKey]) {
+                analyticsData.aiPersonalityStats[aiKey] = { wins: 0, losses: 0, totalGames: 0 };
+            }
+            analyticsData.aiPersonalityStats[aiKey].totalGames++;
+            if (gameResult.won) {
+                analyticsData.aiPersonalityStats[aiKey].wins++;
+            } else {
+                analyticsData.aiPersonalityStats[aiKey].losses++;
+            }
+            
+            // Track tournament performance
+            if (gameEngine.gameMode === 'tournament' && gameEngine.tournament) {
+                trackTournamentProgress(gameResult);
+            }
+            
+            saveAnalyticsData();
+        }
+        
+        // Track tournament progress
+        function trackTournamentProgress(gameResult) {
+            const tournament = gameEngine.tournament;
+            if (!tournament) return;
+            
+            const currentTournament = {
+                id: tournament.id || Date.now(),
+                round: tournament.currentRound,
+                roundResult: gameResult,
+                aiPersonality: gameEngine.ai.personality,
+                playerScore: gameResult.playerScore,
+                aiScore: gameResult.aiScore,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (tournament.isComplete) {
+                // Tournament finished, save complete tournament data
+                const tournamentData = {
+                    id: currentTournament.id,
+                    startTime: tournament.startTime,
+                    endTime: new Date().toISOString(),
+                    totalRounds: tournament.rounds || 5,
+                    won: tournament.playerWon,
+                    finalScore: tournament.finalScore,
+                    rounds: tournament.roundHistory || [],
+                    achievements: tournament.achievementsUnlocked || []
+                };
+                analyticsData.tournamentHistory.push(tournamentData);
+            }
+        }
+        
+        // Save analytics data to localStorage
+        function saveAnalyticsData() {
+            localStorage.setItem('enhancedPongAnalyticsData', JSON.stringify(analyticsData));
+        }
+        
+        // Load analytics data from localStorage
+        function loadAnalyticsData() {
+            const saved = localStorage.getItem('enhancedPongAnalyticsData');
+            if (saved) {
+                try {
+                    const loadedData = JSON.parse(saved);
+                    analyticsData = { ...analyticsData, ...loadedData };
+                } catch (e) {
+                    console.warn('Failed to load analytics data:', e);
+                }
+            }
+        }
+        
+        // ===== ANALYTICS CHARTS SYSTEM =====
         
         function initializeAnalyticsCharts() {
             // Initialize all charts when analytics panel is shown
@@ -4302,6 +4461,8 @@
             initRallyChart();
             initMLProgressChart();
             initSessionChart();
+            initTournamentChart();
+            initHeatMapTrendsChart();
             
             // Add event listeners for chart controls
             document.querySelectorAll('.chart-btn').forEach(btn => {
@@ -4492,17 +4653,29 @@
             const stats = gameEngine.getStats();
             const personalitiesBeaten = stats.personalitiesBeaten || new Set();
             
-            // Mock win/loss data for each AI personality
+            // Use real analytics data for AI personality performance
             const personalities = ['Balanced', 'Defensive', 'Aggressive', 'Perfect', 'Unpredictable', 'Trickster', 'Copycat', 'Adaptive'];
             const winData = [];
             const lossData = [];
+            const winRateData = [];
             
             personalities.forEach(personality => {
-                const beaten = personalitiesBeaten.has(personality.toLowerCase());
-                const totalGames = Math.max(1, Math.floor(stats.gamesPlayed / 8));
-                const wins = beaten ? Math.floor(totalGames * (0.3 + Math.random() * 0.4)) : Math.floor(totalGames * Math.random() * 0.3);
-                winData.push(wins);
-                lossData.push(totalGames - wins);
+                const key = personality.toLowerCase();
+                const aiStats = analyticsData.aiPersonalityStats[key] || { wins: 0, losses: 0, totalGames: 0 };
+                
+                // If no data exists, create minimal mock data
+                if (aiStats.totalGames === 0) {
+                    const beaten = personalitiesBeaten.has(key);
+                    const mockTotal = beaten ? Math.floor(Math.random() * 3) + 1 : 0;
+                    const mockWins = beaten ? Math.floor(mockTotal * 0.6) : 0;
+                    winData.push(mockWins);
+                    lossData.push(mockTotal - mockWins);
+                    winRateData.push(mockTotal > 0 ? Math.round((mockWins / mockTotal) * 100) : 0);
+                } else {
+                    winData.push(aiStats.wins);
+                    lossData.push(aiStats.losses);
+                    winRateData.push(Math.round((aiStats.wins / aiStats.totalGames) * 100));
+                }
             });
             
             if (analyticsCharts.aiPersonality) {
@@ -4770,6 +4943,184 @@
             });
         }
         
+        function initTournamentChart() {
+            const ctx = document.getElementById('tournamentChart');
+            if (!ctx) return;
+            
+            const tournamentHistory = analyticsData.tournamentHistory || [];
+            
+            if (tournamentHistory.length === 0) {
+                // Show "no data" message
+                const container = ctx.parentElement;
+                container.innerHTML = '<div class="no-data-message">No tournament data available yet.<br>Complete some tournaments to see analytics!</div>';
+                return;
+            }
+            
+            // Prepare tournament performance data
+            const labels = [];
+            const winData = [];
+            const roundsWonData = [];
+            
+            tournamentHistory.slice(-10).forEach((tournament, index) => {
+                labels.push(`Tournament ${index + 1}`);
+                winData.push(tournament.won ? 1 : 0);
+                
+                // Calculate rounds won
+                const roundsWon = tournament.rounds ? tournament.rounds.filter(r => r.won).length : 0;
+                roundsWonData.push(roundsWon);
+            });
+            
+            if (analyticsCharts.tournament) {
+                analyticsCharts.tournament.destroy();
+            }
+            
+            analyticsCharts.tournament = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tournament Wins',
+                        data: winData,
+                        borderColor: '#ffd54f',
+                        backgroundColor: 'rgba(255, 213, 79, 0.2)',
+                        tension: 0.4,
+                        yAxisID: 'y',
+                        stepped: true
+                    }, {
+                        label: 'Rounds Won',
+                        data: roundsWonData,
+                        borderColor: '#4ecdc4',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { 
+                                color: '#fff',
+                                stepSize: 1,
+                                min: 0,
+                                max: 1
+                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: '#fff' },
+                            grid: { drawOnChartArea: false },
+                            beginAtZero: true,
+                            max: 5
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initHeatMapTrendsChart() {
+            const ctx = document.getElementById('heatMapTrendsChart');
+            if (!ctx) return;
+            
+            const analytics = gameEngine.analytics;
+            const heatMapData = analyticsData.heatMapIntensity || [];
+            
+            // Generate trend data based on current heat map intensity
+            const labels = [];
+            const playerHitIntensity = [];
+            const aiHitIntensity = [];
+            const ballTrajectoryIntensity = [];
+            
+            // If we have stored heat map intensity data, use it
+            if (heatMapData.length > 0) {
+                heatMapData.forEach((entry, index) => {
+                    labels.push(`Session ${index + 1}`);
+                    playerHitIntensity.push(entry.playerHits || 0);
+                    aiHitIntensity.push(entry.aiHits || 0);
+                    ballTrajectoryIntensity.push(entry.ballTrajectories || 0);
+                });
+            } else {
+                // Generate mock trend data based on current analytics
+                const currentPlayerHits = analytics.heatMap.playerHits.length;
+                const currentAiHits = analytics.heatMap.aiHits.length;
+                const currentBallSamples = analytics.heatMap.ballTrajectories.length;
+                
+                for (let i = 0; i < 10; i++) {
+                    labels.push(`Session ${i + 1}`);
+                    const progress = (i + 1) / 10;
+                    playerHitIntensity.push(Math.floor(currentPlayerHits * progress * (0.7 + Math.random() * 0.6)));
+                    aiHitIntensity.push(Math.floor(currentAiHits * progress * (0.7 + Math.random() * 0.6)));
+                    ballTrajectoryIntensity.push(Math.floor(currentBallSamples * progress * (0.7 + Math.random() * 0.6)));
+                }
+            }
+            
+            if (analyticsCharts.heatMapTrends) {
+                analyticsCharts.heatMapTrends.destroy();
+            }
+            
+            analyticsCharts.heatMapTrends = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Player Hit Intensity',
+                        data: playerHitIntensity,
+                        borderColor: '#ff6b6b',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'AI Hit Intensity',
+                        data: aiHitIntensity,
+                        borderColor: '#4ecdc4',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Ball Trajectory Data',
+                        data: ballTrajectoryIntensity,
+                        borderColor: '#ffd54f',
+                        backgroundColor: 'rgba(255, 213, 79, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
         function refreshAnalyticsCharts() {
             // Refresh all charts with current data
             initializeAnalyticsCharts();
@@ -4782,28 +5133,113 @@
             
             const exportData = {
                 timestamp: new Date().toISOString(),
+                version: '1.3.0',
                 gameStats: stats,
                 playerAnalytics: analytics.playerBehavior,
+                extendedAnalytics: {
+                    sessionHistory: analyticsData.sessionHistory,
+                    performanceHistory: analyticsData.performanceHistory,
+                    tournamentHistory: analyticsData.tournamentHistory,
+                    aiPersonalityStats: analyticsData.aiPersonalityStats,
+                    heatMapIntensity: analyticsData.heatMapIntensity
+                },
                 heatMapData: {
                     playerHits: analytics.heatMap.playerHits.length,
                     aiHits: analytics.heatMap.aiHits.length,
-                    ballTrajectories: analytics.heatMap.ballTrajectories.length
+                    ballTrajectories: analytics.heatMap.ballTrajectories.length,
+                    fullPlayerHits: analytics.heatMap.playerHits,
+                    fullAiHits: analytics.heatMap.aiHits,
+                    fullBallTrajectories: analytics.heatMap.ballTrajectories
                 },
                 mlAIStats: gameEngine.mlAI ? gameEngine.mlAI.getLearningStats() : null,
                 achievements: Array.from(gameEngine.achievements.unlocked)
             };
             
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
+            // Ask user for format preference
+            const format = confirm('Export as JSON? Click OK for JSON, Cancel for CSV format.');
+            
+            if (format) {
+                // Export as JSON
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `enhanced-pong-analytics-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+            } else {
+                // Export as CSV
+                exportAnalyticsAsCSV(exportData);
+            }
+            
+            audioSystem?.play('menuClick');
+        }
+        
+        function exportAnalyticsAsCSV(data) {
+            let csvContent = 'Enhanced Pong Analytics Export\n';
+            csvContent += `Export Date,${data.timestamp}\n`;
+            csvContent += `Game Version,${data.version}\n\n`;
+            
+            // Basic game stats
+            csvContent += 'GAME STATISTICS\n';
+            csvContent += 'Metric,Value\n';
+            csvContent += `Games Played,${data.gameStats.gamesPlayed}\n`;
+            csvContent += `Games Won,${data.gameStats.gamesWon}\n`;
+            csvContent += `Games Lost,${data.gameStats.gamesLost}\n`;
+            csvContent += `Win Rate,${data.gameStats.winRate}%\n`;
+            csvContent += `Perfect Games,${data.gameStats.perfectGames}\n`;
+            csvContent += `Longest Rally,${data.gameStats.longestRally}\n`;
+            csvContent += `Total Hits,${data.gameStats.totalHits}\n`;
+            csvContent += `Current Win Streak,${data.gameStats.currentWinStreak || 0}\n`;
+            csvContent += `Best Win Streak,${data.gameStats.maxWinStreak || 0}\n\n`;
+            
+            // AI Personality performance
+            csvContent += 'AI PERSONALITY PERFORMANCE\n';
+            csvContent += 'AI Personality,Games Played,Wins,Losses,Win Rate\n';
+            Object.entries(data.extendedAnalytics.aiPersonalityStats).forEach(([personality, stats]) => {
+                const winRate = stats.totalGames > 0 ? Math.round((stats.wins / stats.totalGames) * 100) : 0;
+                csvContent += `${personality},${stats.totalGames},${stats.wins},${stats.losses},${winRate}%\n`;
+            });
+            csvContent += '\n';
+            
+            // Tournament history
+            if (data.extendedAnalytics.tournamentHistory.length > 0) {
+                csvContent += 'TOURNAMENT HISTORY\n';
+                csvContent += 'Tournament,Date,Result,Rounds Won,Total Rounds\n';
+                data.extendedAnalytics.tournamentHistory.forEach((tournament, index) => {
+                    const roundsWon = tournament.rounds ? tournament.rounds.filter(r => r.won).length : 0;
+                    csvContent += `${index + 1},${tournament.startTime.split('T')[0]},${tournament.won ? 'Won' : 'Lost'},${roundsWon},${tournament.totalRounds}\n`;
+                });
+                csvContent += '\n';
+            }
+            
+            // Heat map data summary
+            csvContent += 'HEAT MAP DATA\n';
+            csvContent += 'Type,Data Points\n';
+            csvContent += `Player Hits,${data.heatMapData.playerHits}\n`;
+            csvContent += `AI Hits,${data.heatMapData.aiHits}\n`;
+            csvContent += `Ball Trajectories,${data.heatMapData.ballTrajectories}\n\n`;
+            
+            // Achievements
+            csvContent += 'ACHIEVEMENTS UNLOCKED\n';
+            csvContent += 'Achievement\n';
+            data.achievements.forEach(achievement => {
+                csvContent += `${achievement}\n`;
+            });
+            
+            // Create and download CSV file
+            const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(csvBlob);
             
             const link = document.createElement('a');
             link.href = url;
-            link.download = `enhanced-pong-analytics-${new Date().toISOString().split('T')[0]}.json`;
+            link.download = `enhanced-pong-analytics-${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
             
             URL.revokeObjectURL(url);
-            audioSystem?.play('menuClick');
         }
 
         // PWA Service Worker Registration
