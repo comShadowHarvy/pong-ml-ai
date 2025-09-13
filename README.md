@@ -4,7 +4,7 @@
 
 A modern, feature-rich Pong game with advanced AI, machine learning, analytics, and stunning visual effects.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Web-green.svg)
 ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red.svg)
 
@@ -44,14 +44,16 @@ Alternatively, clone the repository and open `enhanced-pong.html` in your web br
 - **Classic**: Traditional Pong gameplay
 - **Speedball**: Ball speed increases over time
 - **Survival**: Limited lives, survive as long as possible
-- **Tournament**: Best of series matches
+- **Tournament**: 5-round championship with rankings and leaderboards
 - **Practice**: No scoring, pure practice mode
 - **Multiplayer**: Local two-player mode
 
-### 🏆 Achievement System
-- **14 Unlockable Achievements**: From first victory to mastering all AI personalities
-- **Progress Tracking**: See how close you are to unlocking each achievement
-- **Skill Recognition**: Achievements for consistency, reflexes, and various play styles
+### 🏆 Achievement & Tournament System
+- **15+ Unlockable Achievements**: Including tournament-specific rewards and opponent victories
+- **Tournament Leaderboards**: Global rankings with player statistics and streaks
+- **Championship System**: 5-round tournaments with progressive AI difficulty
+- **Progress Tracking**: Comprehensive tournament history and personal records
+- **Skill Recognition**: Achievements for consistency, reflexes, and tournament mastery
 
 ### 🎨 Visual Excellence
 - **16 Stunning Themes**: From Neon to Galaxy, including accessibility-friendly options
@@ -125,7 +127,13 @@ Alternatively, clone the repository and open `enhanced-pong.html` in your web br
 
 See [TODO.md](TODO.md) for detailed development plans and upcoming features.
 
-### Next Release (v1.1.0)
+### ✅ Latest Release (v1.2.0) - COMPLETED
+- **Tournament System**: 5-round championship with leaderboards
+- **Achievement Expansion**: 15+ achievements including tournament rewards  
+- **Rankings System**: Global leaderboards and player rankings
+- **Tournament Analytics**: Comprehensive performance tracking
+
+### Next Release (v1.3.0)
 - **Analytics Dashboard**: Beautiful Chart.js visualizations
 - **Performance Graphs**: Trends and improvement tracking
 - **Enhanced Statistics**: More detailed data presentation
