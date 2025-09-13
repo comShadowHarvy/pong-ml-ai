@@ -10,7 +10,23 @@ A modern, feature-rich Pong game with advanced AI, machine learning, analytics, 
 
 ## 🎮 Play Now
 
-Open `enhanced-pong.html` in your web browser to start playing!
+### 🌐 **Play Online (PWA)**
+**[✨ Launch Enhanced Pong PWA ✨](https://comshadowharvy.github.io/pong-ml-ai/)**
+
+- 🚀 **Instant Play**: No download required, runs in any browser
+- 📱 **Progressive Web App**: Install as a native app on your device
+- 🔄 **Auto-Updates**: Always get the latest features automatically
+- 💾 **Offline Support**: Play even without internet connection
+- 📊 **Cloud-Free**: All data stays private on your device
+
+### 📱 **Install as App**
+1. Visit the PWA link above
+2. Look for the "Install" prompt in your browser
+3. Click "Install" to add it to your home screen/desktop
+4. Launch like any native app!
+
+### 💻 **Local Development**
+Alternatively, clone the repository and open `enhanced-pong.html` in your web browser.
 
 ## ✨ Features
 
@@ -53,7 +69,27 @@ Open `enhanced-pong.html` in your web browser to start playing!
 - **Theme System**: Choose from 16 different visual themes
 - **Cache Management**: Clear all data for fresh starts or troubleshooting
 
-## 🛠️ Technical Features
+## 📱 Progressive Web App (PWA) Features
+
+### ✨ **Native App Experience**
+- **Installable**: Add to home screen/desktop like any native app
+- **Offline Ready**: Full functionality without internet connection
+- **Fast Loading**: Cached resources for instant startup
+- **Native Icons**: Custom app icons and splash screens
+
+### 🔄 **Automatic Updates**
+- **Seamless Updates**: New features deploy automatically
+- **Version Management**: Service worker handles cache updates
+- **Background Sync**: Update checks happen behind the scenes
+- **Zero Maintenance**: Users always get the latest version
+
+### 🛡️ **Privacy & Security**
+- **Local Storage Only**: All game data stays on your device
+- **No Analytics Tracking**: Your gameplay data is completely private
+- **No Account Required**: Start playing immediately
+- **Secure HTTPS**: Served over encrypted connection
+
+## 🔧 Technical Features
 
 ### 🧠 Machine Learning
 - **Behavioral Analysis**: Tracks player movement patterns, reaction times, and strategies
@@ -120,12 +156,18 @@ See [TODO.md](TODO.md) for detailed development plans and upcoming features.
 
 ## 📝 About the Author
 
-**ShadowHarvy** is a passionate game developer focused on creating engaging, technically sophisticated gaming experiences. This Enhanced Pong project showcases advanced web technologies, AI implementation, and user experience design.
+**ShadowHarvy** is a backend developer with a passion for security and a growing interest in game development. This Enhanced Pong project represents an exploration into frontend technologies, AI-driven gameplay mechanics, and Progressive Web App development.
 
-### Contact & Social
-- **GitHub**: [@ShadowHarvy](https://github.com/ShadowHarvy)
-- **Project**: Enhanced Pong Ultimate Edition
-- **Platform**: Web (HTML5/JavaScript)
+- 🖥️ **Background**: Backend Development & Security
+- 🎮 **Journey**: Exploring game development and frontend technologies
+- 🔒 **Interest**: Security-conscious development practices
+- 🐧 **Platform**: Linux (CachyOS) development environment
+
+### Links & Deployment
+- **🌐 Play Live**: [Enhanced Pong PWA](https://comshadowharvy.github.io/pong-ml-ai/)
+- **💻 GitHub**: [Project Repository](https://github.com/comShadowHarvy/pong-ml-ai)
+- **🚀 Deployment**: GitHub Pages with automatic PWA updates
+- **🛠️ Platform**: Web (HTML5/JavaScript/PWA)
 
 ## 📄 License
 
