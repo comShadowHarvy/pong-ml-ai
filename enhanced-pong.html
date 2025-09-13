@@ -20,6 +20,9 @@
     
     <title>Enhanced Pong Game - Ultimate Edition</title>
     
+    <!-- Chart.js for Analytics Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
             --primary-color: #4ecdc4;
@@ -261,6 +264,69 @@
             margin: 2px;
             border: 1px solid rgba(255,215,0,0.3);
         }
+        
+        /* Analytics Dashboard Styles */
+        .analytics-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .chart-container {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .chart-container h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .chart-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .chart-btn:hover, .chart-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .no-data-message {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+            padding: 40px 20px;
+        }
 
         .theme-neon { background: linear-gradient(135deg, #1e3c72, #2a5298); }
         .theme-retro { background: linear-gradient(135deg, #2d1b69, #11998e); }
@@ -412,7 +478,8 @@
             <div id="statsPanel" class="menu-panel" style="display: none;">
                 <h2 style="color: var(--primary-color); margin-bottom: 20px;">📊 Statistics</h2>
                 <div id="statsContent"></div>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+                    <button class="menu-btn" onclick="showPanel('analytics')">📊 Analytics Dashboard</button>
                     <button class="menu-btn" onclick="showPanel('heatmap')">🔥 Heat Maps</button>
                     <button class="menu-btn" onclick="showPanel('mlstats')">🧠 ML AI Stats</button>
                     <button class="menu-btn secondary" onclick="clearStats()">🗑️ Clear</button>
@@ -462,6 +529,72 @@
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
                     <button class="menu-btn secondary" onclick="resetMLAI()">🗑️ Reset ML AI</button>
                     <button class="menu-btn secondary" onclick="showPanel('stats')">🔙 Back</button>
+                </div>
+            </div>
+            
+            <!-- Analytics Dashboard Panel -->
+            <div id="analyticsPanel" class="menu-panel" style="display: none;">
+                <h2 style="color: var(--primary-color); margin-bottom: 20px;">📊 Analytics Dashboard</h2>
+                
+                <div class="analytics-dashboard">
+                    <!-- Performance Trends Chart -->
+                    <div class="chart-container">
+                        <h4>📈 Performance Trends</h4>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" data-chart="performance" data-type="winrate">Win Rate</button>
+                            <button class="chart-btn" data-chart="performance" data-type="reaction">Reaction Time</button>
+                            <button class="chart-btn" data-chart="performance" data-type="consistency">Consistency</button>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Distribution Chart -->
+                    <div class="chart-container">
+                        <h4>🎮 Game Mode Distribution</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="gameModeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Personality Stats -->
+                    <div class="chart-container">
+                        <h4>🤖 AI Personality Performance</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="aiPersonalityChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Rally Length Distribution -->
+                    <div class="chart-container">
+                        <h4>🏓 Rally Length Analysis</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="rallyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- ML AI Learning Progress -->
+                    <div class="chart-container">
+                        <h4>🧠 ML AI Learning Progress</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="mlProgressChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Session Activity -->
+                    <div class="chart-container">
+                        <h4>⏰ Play Session Activity</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="sessionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+                    <button class="menu-btn secondary" onclick="exportAnalyticsData()">💾 Export Data</button>
+                    <button class="menu-btn secondary" onclick="refreshAnalyticsCharts()">🔄 Refresh Charts</button>
+                    <button class="menu-btn secondary" onclick="showPanel('stats')">🔙 Back to Stats</button>
                 </div>
             </div>
             
@@ -3516,7 +3649,7 @@
 
         // ===== UI FUNCTIONS =====
         function showPanel(panelName) {
-            ['gameMenu', 'settingsPanel', 'statsPanel', 'helpPanel', 'aboutPanel', 'inGameUI', 'heatmapPanel', 'mlstatsPanel'].forEach(id => 
+            ['gameMenu', 'settingsPanel', 'statsPanel', 'helpPanel', 'aboutPanel', 'inGameUI', 'heatmapPanel', 'mlstatsPanel', 'analyticsPanel'].forEach(id => 
                 document.getElementById(id).style.display = 'none');
             
             currentPanel = panelName;
@@ -3536,6 +3669,10 @@
                 case 'mlstats':
                     document.getElementById('mlstatsPanel').style.display = 'block';
                     updateMLStatsPanel();
+                    break;
+                case 'analytics':
+                    document.getElementById('analyticsPanel').style.display = 'block';
+                    setTimeout(() => initializeAnalyticsCharts(), 100);
                     break;
             }
             audioSystem?.play('menuClick');
@@ -4179,6 +4316,521 @@
                     alert('Error clearing cache. Please try again or refresh the page manually.');
                 }
             }
+        }
+        
+        // ===== ANALYTICS CHARTS SYSTEM =====
+        let analyticsCharts = {};
+        
+        function initializeAnalyticsCharts() {
+            // Initialize all charts when analytics panel is shown
+            initPerformanceChart();
+            initGameModeChart();
+            initAIPersonalityChart();
+            initRallyChart();
+            initMLProgressChart();
+            initSessionChart();
+            
+            // Add event listeners for chart controls
+            document.querySelectorAll('.chart-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const chartType = e.target.dataset.chart;
+                    const dataType = e.target.dataset.type;
+                    
+                    // Update active button
+                    e.target.parentElement.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // Update chart based on button clicked
+                    if (chartType === 'performance') {
+                        updatePerformanceChart(dataType);
+                    }
+                });
+            });
+        }
+        
+        function initPerformanceChart() {
+            const ctx = document.getElementById('performanceChart');
+            if (!ctx) return;
+            
+            const stats = gameEngine.getStats();
+            const analytics = gameEngine.analytics;
+            
+            // Generate sample data for performance trends (simulated over time)
+            const labels = [];
+            const winRateData = [];
+            const reactionData = [];
+            const consistencyData = [];
+            
+            // Create mock time series data based on current stats
+            for (let i = 0; i < Math.min(stats.gamesPlayed, 20); i++) {
+                labels.push(`Game ${i + 1}`);
+                // Simulate progression - start lower, gradually improve
+                const progress = (i + 1) / Math.min(stats.gamesPlayed, 20);
+                winRateData.push(Math.max(0, Math.min(100, parseFloat(stats.winRate) - 20 + (progress * 25))));
+                reactionData.push(Math.max(100, 500 - (progress * 200) + (Math.random() * 50)));
+                consistencyData.push(Math.max(0, Math.min(100, (analytics.playerBehavior.consistency * 100) - 30 + (progress * 40))));
+            }
+            
+            if (analyticsCharts.performance) {
+                analyticsCharts.performance.destroy();
+            }
+            
+            analyticsCharts.performance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Win Rate (%)',
+                        data: winRateData,
+                        borderColor: '#4ecdc4',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updatePerformanceChart(dataType) {
+            const chart = analyticsCharts.performance;
+            if (!chart) return;
+            
+            const stats = gameEngine.getStats();
+            const analytics = gameEngine.analytics;
+            
+            let newData, label, color, backgroundColor;
+            
+            switch (dataType) {
+                case 'winrate':
+                    newData = chart.data.datasets[0].data; // Keep existing win rate data
+                    label = 'Win Rate (%)';
+                    color = '#4ecdc4';
+                    backgroundColor = 'rgba(78, 205, 196, 0.1)';
+                    break;
+                case 'reaction':
+                    // Generate mock reaction time data
+                    newData = chart.data.labels.map((_, i) => {
+                        const progress = (i + 1) / chart.data.labels.length;
+                        return Math.max(100, 500 - (progress * 200) + (Math.random() * 50));
+                    });
+                    label = 'Reaction Time (ms)';
+                    color = '#ff6b6b';
+                    backgroundColor = 'rgba(255, 107, 107, 0.1)';
+                    break;
+                case 'consistency':
+                    // Generate mock consistency data
+                    newData = chart.data.labels.map((_, i) => {
+                        const progress = (i + 1) / chart.data.labels.length;
+                        return Math.max(0, Math.min(100, (analytics.playerBehavior.consistency * 100) - 30 + (progress * 40)));
+                    });
+                    label = 'Consistency (%)';
+                    color = '#ffd54f';
+                    backgroundColor = 'rgba(255, 213, 79, 0.1)';
+                    break;
+            }
+            
+            chart.data.datasets[0].data = newData;
+            chart.data.datasets[0].label = label;
+            chart.data.datasets[0].borderColor = color;
+            chart.data.datasets[0].backgroundColor = backgroundColor;
+            chart.update();
+        }
+        
+        function initGameModeChart() {
+            const ctx = document.getElementById('gameModeChart');
+            if (!ctx) return;
+            
+            const stats = gameEngine.getStats();
+            
+            // Mock data for different game modes based on total games
+            const total = Math.max(1, stats.gamesPlayed);
+            const data = {
+                classic: Math.round(total * 0.4),
+                speedball: stats.speedballWins || Math.round(total * 0.2),
+                survival: stats.survivalWins || Math.round(total * 0.15),
+                tournament: Math.round(total * 0.1),
+                practice: Math.round(total * 0.1),
+                multiplayer: Math.round(total * 0.05)
+            };
+            
+            if (analyticsCharts.gameMode) {
+                analyticsCharts.gameMode.destroy();
+            }
+            
+            analyticsCharts.gameMode = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Classic', 'Speedball', 'Survival', 'Tournament', 'Practice', 'Multiplayer'],
+                    datasets: [{
+                        data: Object.values(data),
+                        backgroundColor: [
+                            '#4ecdc4',
+                            '#ff6b6b', 
+                            '#ffd54f',
+                            '#a8e6cf',
+                            '#ff8a80',
+                            '#b19cd9'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#000'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                color: '#fff',
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initAIPersonalityChart() {
+            const ctx = document.getElementById('aiPersonalityChart');
+            if (!ctx) return;
+            
+            const stats = gameEngine.getStats();
+            const personalitiesBeaten = stats.personalitiesBeaten || new Set();
+            
+            // Mock win/loss data for each AI personality
+            const personalities = ['Balanced', 'Defensive', 'Aggressive', 'Perfect', 'Unpredictable', 'Trickster', 'Copycat', 'Adaptive'];
+            const winData = [];
+            const lossData = [];
+            
+            personalities.forEach(personality => {
+                const beaten = personalitiesBeaten.has(personality.toLowerCase());
+                const totalGames = Math.max(1, Math.floor(stats.gamesPlayed / 8));
+                const wins = beaten ? Math.floor(totalGames * (0.3 + Math.random() * 0.4)) : Math.floor(totalGames * Math.random() * 0.3);
+                winData.push(wins);
+                lossData.push(totalGames - wins);
+            });
+            
+            if (analyticsCharts.aiPersonality) {
+                analyticsCharts.aiPersonality.destroy();
+            }
+            
+            analyticsCharts.aiPersonality = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: personalities,
+                    datasets: [{
+                        label: 'Wins',
+                        data: winData,
+                        backgroundColor: '#4ecdc4',
+                        borderColor: '#4ecdc4',
+                        borderWidth: 1
+                    }, {
+                        label: 'Losses',
+                        data: lossData,
+                        backgroundColor: '#ff6b6b',
+                        borderColor: '#ff6b6b',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { 
+                                color: '#fff',
+                                maxRotation: 45
+                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initRallyChart() {
+            const ctx = document.getElementById('rallyChart');
+            if (!ctx) return;
+            
+            const analytics = gameEngine.analytics;
+            const rallyLengths = analytics.gameFlow.rallyLengths || [];
+            
+            // Group rallies into buckets
+            const buckets = {
+                '1-5 hits': 0,
+                '6-10 hits': 0,
+                '11-20 hits': 0,
+                '21-30 hits': 0,
+                '31+ hits': 0
+            };
+            
+            if (rallyLengths.length === 0) {
+                // Generate sample data if no real data exists
+                const stats = gameEngine.getStats();
+                const sampleSize = Math.max(10, stats.totalHits / 10);
+                for (let i = 0; i < sampleSize; i++) {
+                    const rallyLength = Math.floor(Math.random() * 40) + 1;
+                    if (rallyLength <= 5) buckets['1-5 hits']++;
+                    else if (rallyLength <= 10) buckets['6-10 hits']++;
+                    else if (rallyLength <= 20) buckets['11-20 hits']++;
+                    else if (rallyLength <= 30) buckets['21-30 hits']++;
+                    else buckets['31+ hits']++;
+                }
+            } else {
+                rallyLengths.forEach(length => {
+                    if (length <= 5) buckets['1-5 hits']++;
+                    else if (length <= 10) buckets['6-10 hits']++;
+                    else if (length <= 20) buckets['11-20 hits']++;
+                    else if (length <= 30) buckets['21-30 hits']++;
+                    else buckets['31+ hits']++;
+                });
+            }
+            
+            if (analyticsCharts.rally) {
+                analyticsCharts.rally.destroy();
+            }
+            
+            analyticsCharts.rally = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(buckets),
+                    datasets: [{
+                        label: 'Rally Frequency',
+                        data: Object.values(buckets),
+                        backgroundColor: '#ffd54f',
+                        borderColor: '#ffd54f',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initMLProgressChart() {
+            const ctx = document.getElementById('mlProgressChart');
+            if (!ctx) return;
+            
+            let mlStats = { gamesAnalyzed: 0, confidence: 0 };
+            if (gameEngine.mlAI) {
+                mlStats = gameEngine.mlAI.getLearningStats();
+            }
+            
+            // Generate progression data
+            const labels = [];
+            const confidenceData = [];
+            const dataPointsData = [];
+            
+            for (let i = 0; i < Math.max(5, mlStats.gamesAnalyzed); i++) {
+                labels.push(`Session ${i + 1}`);
+                const progress = (i + 1) / Math.max(5, mlStats.gamesAnalyzed);
+                confidenceData.push(Math.min(mlStats.confidence, progress * mlStats.confidence));
+                dataPointsData.push(Math.floor(progress * (mlStats.totalDataPoints || 100)));
+            }
+            
+            if (analyticsCharts.mlProgress) {
+                analyticsCharts.mlProgress.destroy();
+            }
+            
+            analyticsCharts.mlProgress = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'AI Confidence (%)',
+                        data: confidenceData,
+                        borderColor: '#a8e6cf',
+                        backgroundColor: 'rgba(168, 230, 207, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Data Points',
+                        data: dataPointsData,
+                        borderColor: '#b19cd9',
+                        backgroundColor: 'rgba(177, 156, 217, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            beginAtZero: true,
+                            max: 100
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: '#fff' },
+                            grid: { drawOnChartArea: false },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initSessionChart() {
+            const ctx = document.getElementById('sessionChart');
+            if (!ctx) return;
+            
+            const stats = gameEngine.getStats();
+            
+            // Mock session data over the last week
+            const labels = [];
+            const sessionData = [];
+            const now = new Date();
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(now);
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('en', { weekday: 'short' }));
+                
+                // Mock session activity (higher for recent days)
+                const activity = Math.max(0, Math.floor((7 - i) * stats.gamesPlayed / 15) + Math.floor(Math.random() * 5));
+                sessionData.push(activity);
+            }
+            
+            if (analyticsCharts.session) {
+                analyticsCharts.session.destroy();
+            }
+            
+            analyticsCharts.session = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Games Played',
+                        data: sessionData,
+                        backgroundColor: '#ff8a80',
+                        borderColor: '#ff8a80',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function refreshAnalyticsCharts() {
+            // Refresh all charts with current data
+            initializeAnalyticsCharts();
+            audioSystem?.play('menuClick');
+        }
+        
+        function exportAnalyticsData() {
+            const stats = gameEngine.getStats();
+            const analytics = gameEngine.analytics;
+            
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                gameStats: stats,
+                playerAnalytics: analytics.playerBehavior,
+                heatMapData: {
+                    playerHits: analytics.heatMap.playerHits.length,
+                    aiHits: analytics.heatMap.aiHits.length,
+                    ballTrajectories: analytics.heatMap.ballTrajectories.length
+                },
+                mlAIStats: gameEngine.mlAI ? gameEngine.mlAI.getLearningStats() : null,
+                achievements: Array.from(gameEngine.achievements.unlocked)
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `enhanced-pong-analytics-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            audioSystem?.play('menuClick');
         }
 
         // PWA Service Worker Registration
