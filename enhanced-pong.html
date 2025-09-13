@@ -187,23 +187,79 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
             text-align: left;
             margin: 20px 0;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
         
-        .stats-grid p {
-            margin: 5px 0;
-            font-size: 14px;
-            word-break: break-word;
+        .stats-section {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
         }
         
-        .stats-grid h3 {
-            margin: 0 0 10px 0;
-            font-size: 16px;
+        .stats-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stats-label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .stats-value {
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--secondary-color);
+        }
+        
+        .stats-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        
+        .stats-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+        
+        .achievement-badge {
+            display: inline-block;
+            background: rgba(255,215,0,0.2);
+            color: #ffd700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 2px;
+            border: 1px solid rgba(255,215,0,0.3);
         }
 
         .theme-neon { background: linear-gradient(135deg, #1e3c72, #2a5298); }
@@ -3579,24 +3635,218 @@
 
         function updateStatsPanel() {
             const stats = gameEngine.getStats();
+            const analytics = gameEngine.analytics;
+            const achievements = gameEngine.achievements;
+            
+            // Helper function to format time
+            const formatTime = (ms) => {
+                if (ms < 60000) return Math.round(ms/1000) + 's';
+                const minutes = Math.floor(ms/60000);
+                const seconds = Math.floor((ms%60000)/1000);
+                return minutes + 'm ' + seconds + 's';
+            };
+            
+            // Calculate additional metrics
+            const reactionTime = gameEngine.getAverageReactionTime();
+            const consistency = Math.round(analytics.playerBehavior.consistency * 100);
+            const defensiveStyle = Math.round(analytics.playerBehavior.defensiveStyle * 100);
+            const personalitiesBeaten = stats.personalitiesBeaten ? stats.personalitiesBeaten.size : 0;
+            const totalAchievements = Object.keys(achievements.definitions).length;
+            const unlockedAchievements = achievements.unlocked.size;
+            const achievementProgress = Math.round((unlockedAchievements / totalAchievements) * 100);
+            
             document.getElementById('statsContent').innerHTML = `
                 <div class="stats-grid">
-                    <div>
-                        <h3>🎮 Games</h3>
-                        <p>Played: <strong>${stats.gamesPlayed}</strong></p>
-                        <p>Won: <strong style="color: #4ecdc4;">${stats.gamesWon}</strong></p>
-                        <p>Lost: <strong style="color: #ff6b6b;">${stats.gamesLost}</strong></p>
-                        <p>Win Rate: <strong>${stats.winRate}%</strong></p>
+                    <!-- Game Statistics -->
+                    <div class="stats-section">
+                        <h3>🎮 Game Statistics</h3>
+                        <div class="stats-item">
+                            <span class="stats-label">Games Played</span>
+                            <span class="stats-value">${stats.gamesPlayed}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Games Won</span>
+                            <span class="stats-value" style="color: #4ecdc4;">${stats.gamesWon}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Games Lost</span>
+                            <span class="stats-value" style="color: #ff6b6b;">${stats.gamesLost}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Win Rate</span>
+                            <span class="stats-value">${stats.winRate}%</span>
+                        </div>
+                        <div class="stats-bar">
+                            <div class="stats-bar-fill" style="width: ${stats.winRate}%"></div>
+                        </div>
                     </div>
-                    <div>
-                        <h3>🏆 Records</h3>
-                        <p>Longest Rally: <strong>${stats.longestRally}</strong></p>
-                        <p>Total Hits: <strong>${stats.totalHits}</strong></p>
-                        <p>Perfect Games: <strong>${stats.perfectGames}</strong></p>
-                        <p>Average Rally: <strong>${stats.averageRally}</strong></p>
+                    
+                    <!-- Performance Records -->
+                    <div class="stats-section">
+                        <h3>🏆 Performance Records</h3>
+                        <div class="stats-item">
+                            <span class="stats-label">Longest Rally</span>
+                            <span class="stats-value">${stats.longestRally} hits</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Total Hits</span>
+                            <span class="stats-value">${stats.totalHits}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Perfect Games</span>
+                            <span class="stats-value">${stats.perfectGames}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Average Rally</span>
+                            <span class="stats-value">${stats.averageRally} hits</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Current Win Streak</span>
+                            <span class="stats-value">${stats.currentWinStreak || 0}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Best Win Streak</span>
+                            <span class="stats-value">${stats.maxWinStreak || 0}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Player Behavior Analytics -->
+                    <div class="stats-section">
+                        <h3>📊 Player Analytics</h3>
+                        <div class="stats-item">
+                            <span class="stats-label">Avg. Reaction Time</span>
+                            <span class="stats-value">${Math.round(reactionTime)}ms</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Movement Consistency</span>
+                            <span class="stats-value">${consistency}%</span>
+                        </div>
+                        <div class="stats-bar">
+                            <div class="stats-bar-fill" style="width: ${consistency}%"></div>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Defensive Style</span>
+                            <span class="stats-value">${defensiveStyle}%</span>
+                        </div>
+                        <div class="stats-bar">
+                            <div class="stats-bar-fill" style="width: ${defensiveStyle}%"></div>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Power-ups Collected</span>
+                            <span class="stats-value">${stats.powerUpsCollected || 0}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Mode Statistics -->
+                    <div class="stats-section">
+                        <h3>🎯 Game Mode Progress</h3>
+                        <div class="stats-item">
+                            <span class="stats-label">Survival Mode Wins</span>
+                            <span class="stats-value">${stats.survivalWins || 0}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Speedball Mode Wins</span>
+                            <span class="stats-value">${stats.speedballWins || 0}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Comeback Victories</span>
+                            <span class="stats-value">${stats.comebacks || 0}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">AI Personalities Beaten</span>
+                            <span class="stats-value">${personalitiesBeaten}/8</span>
+                        </div>
+                        <div class="stats-bar">
+                            <div class="stats-bar-fill" style="width: ${(personalitiesBeaten/8)*100}%"></div>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Total Play Time</span>
+                            <span class="stats-value">${formatTime(stats.totalPlayTime || 0)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Achievement Progress -->
+                    <div class="stats-section">
+                        <h3>🏅 Achievement Progress</h3>
+                        <div class="stats-item">
+                            <span class="stats-label">Achievements Unlocked</span>
+                            <span class="stats-value">${unlockedAchievements}/${totalAchievements}</span>
+                        </div>
+                        <div class="stats-bar">
+                            <div class="stats-bar-fill" style="width: ${achievementProgress}%"></div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            ${Array.from(achievements.unlocked).slice(0, 6).map(id => {
+                                const achievement = achievements.definitions[id];
+                                return achievement ? `<span class="achievement-badge">${achievement.title}</span>` : '';
+                            }).join('')}
+                            ${unlockedAchievements > 6 ? `<span class="achievement-badge">+${unlockedAchievements - 6} more</span>` : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Analytics Summary -->
+                    <div class="stats-section">
+                        <h3>⚡ Quick Summary</h3>
+                        <div class="stats-item">
+                            <span class="stats-label">Skill Level</span>
+                            <span class="stats-value">${getSkillLevel(stats.winRate, stats.gamesPlayed)}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Play Style</span>
+                            <span class="stats-value">${getPlayStyle(defensiveStyle, consistency)}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Best Quality</span>
+                            <span class="stats-value">${getBestQuality(stats, analytics)}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Next Goal</span>
+                            <span class="stats-value">${getNextGoal(stats, achievements)}</span>
+                        </div>
                     </div>
                 </div>
             `;
+        }
+        
+        function getSkillLevel(winRate, gamesPlayed) {
+            if (gamesPlayed < 5) return '🆕 Newcomer';
+            if (winRate >= 80) return '🏆 Master';
+            if (winRate >= 65) return '⭐ Expert';
+            if (winRate >= 50) return '💪 Skilled';
+            if (winRate >= 35) return '📈 Improving';
+            return '🎯 Learning';
+        }
+        
+        function getPlayStyle(defensive, consistency) {
+            if (consistency > 80) {
+                return defensive > 70 ? '🛡️ Steady Guardian' : '⚔️ Consistent Striker';
+            } else if (consistency > 60) {
+                return defensive > 70 ? '🏰 Defensive' : '⚖️ Balanced';
+            } else {
+                return defensive > 70 ? '🎲 Cautious' : '⚡ Aggressive';
+            }
+        }
+        
+        function getBestQuality(stats, analytics) {
+            const qualities = [];
+            if (stats.longestRally >= 30) qualities.push('🏓 Rally Master');
+            if (stats.perfectGames >= 3) qualities.push('🎯 Precision');
+            if (analytics.playerBehavior.consistency >= 0.8) qualities.push('📏 Consistency');
+            if (gameEngine.getAverageReactionTime() < 300) qualities.push('⚡ Quick Reflexes');
+            if (stats.comebacks >= 2) qualities.push('👑 Resilience');
+            return qualities[0] || '🌟 Potential';
+        }
+        
+        function getNextGoal(stats, achievements) {
+            const unlockedCount = achievements.unlocked.size;
+            const totalAchievements = Object.keys(achievements.definitions).length;
+            
+            if (stats.gamesPlayed < 10) return '🎮 Play 10 games';
+            if (stats.winRate < 50) return '📈 Reach 50% win rate';
+            if (stats.longestRally < 25) return '🏓 25-hit rally';
+            if (stats.perfectGames === 0) return '🎯 Perfect game';
+            if (unlockedCount < totalAchievements * 0.5) return '🏅 50% achievements';
+            return '🏆 Master all modes';
         }
 
         function clearStats() {
