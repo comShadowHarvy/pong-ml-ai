@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Enhanced Pong - Classic arcade game with Machine Learning AI opponent that adapts to your play style. Features multiple game modes, themes, and comprehensive statistics.">
+    <meta name="keywords" content="pong, arcade, game, AI, machine learning, web game, HTML5, PWA">
+    <meta name="author" content="ShadowHarvy">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4ecdc4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Enhanced Pong">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Enhanced Pong - ML AI Game">
+    <meta property="og:description" content="Play Enhanced Pong with Machine Learning AI that learns and adapts to your playing style!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://comshadowharvy.github.io/pong-ml-ai/">
+    <meta property="og:image" content="https://comshadowharvy.github.io/pong-ml-ai/icon-512x512.png">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Enhanced Pong - ML AI Game">
+    <meta name="twitter:description" content="Classic Pong with Machine Learning AI opponent. 8 AI personalities, heat maps, and comprehensive stats!">
+    <meta name="twitter:image" content="https://comshadowharvy.github.io/pong-ml-ai/icon-512x512.png">
+    
+    <title>Enhanced Pong - ML AI Game</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(78, 205, 196, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature h3 {
+            color: #4ecdc4;
+            margin-bottom: 0.5rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #5dd8d0, #4fb3a0);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .install-prompt {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid #4ecdc4;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .install-prompt.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(78, 205, 196, 0.6);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <h1 class="title">🏓 Enhanced Pong</h1>
+        <p class="subtitle">Classic arcade game with Machine Learning AI that adapts to your play style</p>
+        
+        <div class="install-prompt" id="installPrompt">
+            <h3>📱 Install as App</h3>
+            <p>Install Enhanced Pong as a Progressive Web App for the best experience!</p>
+            <button class="btn btn-primary" id="installBtn">⬇️ Install Game</button>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>🧠 Smart AI</h3>
+                <p>8 AI personalities that learn and adapt to your playing style</p>
+            </div>
+            <div class="feature">
+                <h3>📊 Analytics</h3>
+                <p>Heat maps, statistics, and comprehensive gameplay tracking</p>
+            </div>
+            <div class="feature">
+                <h3>🎨 Themes</h3>
+                <p>16 beautiful themes including accessibility options</p>
+            </div>
+            <div class="feature">
+                <h3>🎮 Game Modes</h3>
+                <p>Classic, Speedball, Survival, Tournament, and more</p>
+            </div>
+            <div class="feature">
+                <h3>📱 Mobile Ready</h3>
+                <p>Responsive design with touch controls for all devices</p>
+            </div>
+            <div class="feature">
+                <h3>🏆 Achievements</h3>
+                <p>Unlock rewards and track your progress over time</p>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <a href="enhanced-pong.html" class="btn btn-primary">
+                🚀 Play Enhanced Pong
+            </a>
+            <a href="pong.html" class="btn btn-secondary">
+                🎯 Play Classic Pong
+            </a>
+            <a href="https://github.com/comShadowHarvy/pong-ml-ai" class="btn btn-secondary" target="_blank">
+                📖 View Source Code
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>Created by <strong>ShadowHarvy</strong> • Open Source • Progressive Web App</p>
+            <p>Experience the evolution of classic Pong with modern AI and analytics!</p>
+        </div>
+    </div>
+
+    <script>
+        // PWA Install functionality
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.classList.add('show');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
+                installPrompt.classList.remove('show');
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installPrompt.classList.remove('show');
+            console.log('PWA was installed');
+        });
+
+        // Animated particles background
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.width = particle.style.height = Math.random() * 8 + 4 + 'px';
+            particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            
+            document.getElementById('particles').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 8000);
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 300);
+        
+        // Create initial particles
+        for (let i = 0; i < 20; i++) {
+            setTimeout(createParticle, i * 100);
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('SW registered:', registration.scope))
+                    .catch(error => console.error('SW registration failed:', error));
+            });
+        }
+    </script>
+</body>
+</html>

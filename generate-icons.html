@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Generator for Enhanced Pong</title>
+</head>
+<body>
+    <h1>Generating Enhanced Pong Icons...</h1>
+    <div id="status">Generating icons...</div>
+    
+    <script>
+        function generateIcon(size, filename) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#4ecdc4');
+            gradient.addColorStop(1, '#44a08d');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Pong paddle (left)
+            ctx.fillStyle = '#ffffff';
+            const paddleWidth = size * 0.08;
+            const paddleHeight = size * 0.4;
+            ctx.fillRect(size * 0.15, (size - paddleHeight) / 2, paddleWidth, paddleHeight);
+            
+            // Pong paddle (right)
+            ctx.fillRect(size * 0.77, (size - paddleHeight) / 2, paddleWidth, paddleHeight);
+            
+            // Ball
+            const ballRadius = size * 0.08;
+            ctx.beginPath();
+            ctx.arc(size * 0.5, size * 0.5, ballRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Center line (dashed)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = size * 0.01;
+            ctx.setLineDash([size * 0.04, size * 0.02]);
+            ctx.beginPath();
+            ctx.moveTo(size * 0.5, size * 0.1);
+            ctx.lineTo(size * 0.5, size * 0.9);
+            ctx.stroke();
+            
+            // Convert to data URL and trigger download
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        }
+        
+        // Generate all required icon sizes
+        const icons = [
+            {size: 16, filename: 'favicon-16x16.png'},
+            {size: 32, filename: 'favicon-32x32.png'},
+            {size: 72, filename: 'icon-72x72.png'},
+            {size: 96, filename: 'icon-96x96.png'},
+            {size: 128, filename: 'icon-128x128.png'},
+            {size: 144, filename: 'icon-144x144.png'},
+            {size: 152, filename: 'icon-152x152.png'},
+            {size: 180, filename: 'apple-touch-icon.png'},
+            {size: 192, filename: 'icon-192x192.png'},
+            {size: 384, filename: 'icon-384x384.png'},
+            {size: 512, filename: 'icon-512x512.png'}
+        ];
+        
+        let generated = 0;
+        const statusDiv = document.getElementById('status');
+        
+        icons.forEach((icon, index) => {
+            setTimeout(() => {
+                generateIcon(icon.size, icon.filename);
+                generated++;
+                statusDiv.innerHTML = `Generated ${generated}/${icons.length} icons: ${icon.filename}`;
+                
+                if (generated === icons.length) {
+                    statusDiv.innerHTML += '<br><br><strong>All icons generated! Check your downloads folder.</strong>';
+                }
+            }, index * 500);
+        });
+    </script>
+</body>
+</html>
