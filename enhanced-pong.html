@@ -37,7 +37,7 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
             display: flex;
@@ -45,11 +45,17 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
 
         .game-container {
             position: relative;
             text-align: center;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 10px;
         }
 
         #gameCanvas {
@@ -57,6 +63,8 @@
             border-radius: 10px;
             background: #000;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+            height: auto;
         }
 
         #gameOverlay {
@@ -77,50 +85,104 @@
             transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.95);
             padding: 30px;
-            border-radius: 15px;
+            border-radius: 20px;
             color: white;
             pointer-events: auto;
             border: 2px solid var(--primary-color);
-            box-shadow: 0 0 30px rgba(78,205,196,0.5);
-            backdrop-filter: blur(10px);
-            max-width: 600px;
+            box-shadow: 0 0 40px rgba(78,205,196,0.6), 0 0 80px rgba(78,205,196,0.3);
+            backdrop-filter: blur(15px);
+            max-width: min(600px, 90vw);
             max-height: 90vh;
             overflow-y: auto;
             word-wrap: break-word;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        .menu-panel.slide-out {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+        
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translate(-50%, -40%) scale(0.95);
+            }
         }
 
         .menu-btn {
             background: linear-gradient(45deg, var(--primary-color), #44a08d);
             border: none;
             color: white;
-            padding: 12px 20px;
-            margin: 5px;
-            border-radius: 8px;
+            padding: 14px 24px;
+            margin: 6px;
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: bold;
-            min-width: 140px;
-            transition: all 0.3s ease;
-            font-size: 14px;
+            font-weight: 600;
+            min-width: 160px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .menu-btn:hover::before {
+            left: 100%;
         }
 
         .menu-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(78,205,196,0.4);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(78,205,196,0.5), 0 4px 10px rgba(0,0,0,0.3);
+            filter: brightness(1.1);
+        }
+        
+        .menu-btn:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 4px 15px rgba(78,205,196,0.4);
         }
 
         .menu-btn.secondary {
-            background: linear-gradient(45deg, #666, #444);
+            background: linear-gradient(45deg, #6c7b7f, #4a5759);
         }
 
         .menu-btn.secondary:hover {
-            box-shadow: 0 6px 12px rgba(102,102,102,0.4);
+            box-shadow: 0 8px 25px rgba(108,123,127,0.4), 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .game-modes {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin: 15px 0;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+            justify-items: center;
         }
 
         .settings-grid {
@@ -345,6 +407,181 @@
         .theme-highcontrast { background: linear-gradient(135deg, #ffffff, #f0f0f0); color: #000000; }
         .theme-protanopia { background: linear-gradient(135deg, #0066cc, #004499); }
         .theme-deuteranopia { background: linear-gradient(135deg, #cc6600, #994400); }
+        .theme-midnight { background: linear-gradient(135deg, #000428, #004e92); }
+        .theme-aurora-green { background: linear-gradient(135deg, #00f260, #0575e6); }
+        .theme-rose-gold { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .theme-deep-space { background: linear-gradient(135deg, #0c0c0c, #1a0033, #4a0080); }
+        .theme-golden-hour { background: linear-gradient(135deg, #ff9a9e, #fecfef, #fecfef); }
+        .theme-electric-blue { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .theme-emerald { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .theme-cosmic-purple { background: linear-gradient(135deg, #667db6, #0082c8, #0082c8, #667db6); }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 5px;
+            }
+            
+            .menu-panel {
+                padding: 20px;
+                max-width: 95vw;
+                font-size: 14px;
+            }
+            
+            .menu-btn {
+                min-width: 140px;
+                padding: 16px 20px;
+                font-size: 14px;
+                margin: 4px;
+                /* Larger touch targets for mobile */
+                min-height: 48px;
+            }
+            
+            .game-modes {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .settings-grid {
+                gap: 12px;
+            }
+            
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .setting-item input[type="range"] {
+                width: 100%;
+            }
+            
+            .setting-item select {
+                width: 100%;
+                min-width: auto;
+                padding: 8px;
+            }
+            
+            #gameCanvas {
+                width: 100%;
+                max-width: 100vw;
+                height: auto;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .menu-panel {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            .menu-btn {
+                min-width: 120px;
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+            
+            .game-modes {
+                gap: 8px;
+            }
+        }
+        
+        /* Touch device improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .menu-btn:hover {
+                transform: none;
+                box-shadow: none;
+                filter: none;
+            }
+            
+            .menu-btn:active {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            #gameCanvas {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+        
+        /* Navigation breadcrumbs */
+        .nav-breadcrumb {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 12px;
+            opacity: 0.7;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .nav-breadcrumb .separator {
+            opacity: 0.5;
+        }
+        
+        /* Menu header improvements */
+        .menu-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .menu-title {
+            color: var(--primary-color);
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .menu-subtitle {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+        
+        /* Enhanced form controls */
+        .form-group {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(78,205,196,0.3);
+        }
     </style>
 </head>
 <body>
@@ -354,7 +591,10 @@
         <div id="gameOverlay">
             <!-- Main Menu -->
             <div id="gameMenu" class="menu-panel">
-                <h2 style="color: var(--primary-color); margin-bottom: 20px; font-size: 2.2em;">🏓 ENHANCED PONG</h2>
+                <div class="menu-header">
+                    <h1 class="menu-title">🏓 ENHANCED PONG</h1>
+                    <p class="menu-subtitle">Ultimate Edition - Choose your game mode</p>
+                </div>
                 
                 <div class="game-modes">
                     <button class="menu-btn" onclick="startGame('classic')">🎮 Classic</button>
@@ -365,30 +605,32 @@
                     <button class="menu-btn" onclick="startGame('multiplayer')">👥 Multiplayer</button>
                 </div>
                 
-                <div style="margin: 20px 0;">
-                    <label>AI Difficulty:</label>
-                    <select id="difficultySelect" onchange="changeDifficulty(this.value)" style="width: 200px; padding: 8px; margin: 5px;">
-                        <option value="easy">😊 Easy</option>
-                        <option value="medium" selected>😐 Medium</option>
-                        <option value="hard">😈 Hard</option>
-                    </select>
-                    
-                    <br><label>AI Personality:</label>
-                    <select id="personalitySelect" onchange="changePersonality(this.value)" style="width: 200px; padding: 8px; margin: 5px;">
-                        <option value="balanced" selected>⚖️ Balanced</option>
-                        <option value="defensive">🛡️ Defensive</option>
-                        <option value="aggressive">⚔️ Aggressive</option>
-                        <option value="perfect">🎯 Perfect</option>
-                        <option value="unpredictable">🎲 Unpredictable</option>
-                        <option value="trickster">🃏 Trickster</option>
-                        <option value="copycat">🪞 Copycat</option>
-                        <option value="adaptive">🧠 Adaptive</option>
+                <div class="form-group">
+                    <label>🤖 AI Difficulty:</label>
+                    <select id="difficultySelect" onchange="changeDifficulty(this.value)">
+                        <option value="easy">😊 Easy - Relaxed gameplay</option>
+                        <option value="medium" selected>😐 Medium - Balanced challenge</option>
+                        <option value="hard">😈 Hard - Intense competition</option>
                     </select>
                 </div>
                 
-                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <div class="form-group">
+                    <label>🧠 AI Personality:</label>
+                    <select id="personalitySelect" onchange="changePersonality(this.value)">
+                        <option value="balanced" selected>⚖️ Balanced - Standard AI behavior</option>
+                        <option value="defensive">🛡️ Defensive - Cautious play style</option>
+                        <option value="aggressive">⚔️ Aggressive - Fast & attacking</option>
+                        <option value="perfect">🎯 Perfect - Near-perfect tracking</option>
+                        <option value="unpredictable">🎲 Unpredictable - Random patterns</option>
+                        <option value="trickster">🃏 Trickster - Uses fake movements</option>
+                        <option value="copycat">🪞 Copycat - Mimics your style</option>
+                        <option value="adaptive">🧠 Adaptive - Learns from you</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
                     <button class="menu-btn secondary" onclick="showPanel('settings')">⚙️ Settings</button>
-                    <button class="menu-btn secondary" onclick="showPanel('stats')">📊 Stats</button>
+                    <button class="menu-btn secondary" onclick="showPanel('stats')">📊 Statistics</button>
                     <button class="menu-btn secondary" onclick="showPanel('help')">❓ Help</button>
                     <button class="menu-btn secondary" onclick="showPanel('about')">ℹ️ About</button>
                 </div>
@@ -396,7 +638,15 @@
 
             <!-- Settings Panel -->
             <div id="settingsPanel" class="menu-panel" style="display: none;">
-                <h2 style="color: var(--primary-color); margin-bottom: 20px;">⚙️ Settings</h2>
+                <div class="nav-breadcrumb">
+                    <span>🏓 Main Menu</span>
+                    <span class="separator">></span>
+                    <span>⚙️ Settings</span>
+                </div>
+                <div class="menu-header">
+                    <h1 class="menu-title">⚙️ Settings</h1>
+                    <p class="menu-subtitle">Customize your game experience</p>
+                </div>
                 
                 <div class="settings-grid">
                     <div class="setting-item">
@@ -407,22 +657,43 @@
                     <div class="setting-item">
                         <label>🎨 Theme:</label>
                         <select id="themeSelect" onchange="changeTheme(this.value)">
-                            <option value="neon" selected>🌈 Neon</option>
-                            <option value="retro">👾 Retro</option>
-                            <option value="classic">⚫ Classic</option>
-                            <option value="cyberpunk">🔮 Cyberpunk</option>
-                            <option value="synthwave">🌆 Synthwave</option>
-                            <option value="ocean">🌊 Ocean Depths</option>
-                            <option value="forest">🌲 Forest Night</option>
-                            <option value="sunset">🌅 Sunset Vibes</option>
-                            <option value="galaxy">🌌 Galaxy</option>
-                            <option value="volcanic">🌋 Volcanic</option>
-                            <option value="arctic">❄️ Arctic Ice</option>
-                            <option value="matrix">🟢 Matrix Green</option>
-                            <option value="crimson">🔥 Crimson Fire</option>
-                            <option value="highcontrast">⬜ High Contrast</option>
-                            <option value="protanopia">🔴 Protanopia Friendly</option>
-                            <option value="deuteranopia">🟠 Deuteranopia Friendly</option>
+                            <optgroup label="🌟 Popular Themes">
+                                <option value="neon" selected>🌈 Neon</option>
+                                <option value="cyberpunk">🔮 Cyberpunk</option>
+                                <option value="synthwave">🌆 Synthwave</option>
+                                <option value="midnight">🌙 Midnight Blue</option>
+                                <option value="aurora-green">🌌 Aurora Green</option>
+                            </optgroup>
+                            <optgroup label="🎯 Classic Styles">
+                                <option value="retro">👾 Retro</option>
+                                <option value="classic">⚫ Classic</option>
+                                <option value="matrix">🟢 Matrix Green</option>
+                                <option value="electric-blue">⚡ Electric Blue</option>
+                            </optgroup>
+                            <optgroup label="🌈 Nature & Elements">
+                                <option value="ocean">🌊 Ocean Depths</option>
+                                <option value="forest">🌲 Forest Night</option>
+                                <option value="sunset">🌅 Sunset Vibes</option>
+                                <option value="aurora">🌟 Aurora Borealis</option>
+                                <option value="galaxy">🌌 Galaxy</option>
+                                <option value="emerald">💚 Emerald</option>
+                            </optgroup>
+                            <optgroup label="🔥 Intense Themes">
+                                <option value="volcanic">🌋 Volcanic</option>
+                                <option value="crimson">🔥 Crimson Fire</option>
+                                <option value="deep-space">🚀 Deep Space</option>
+                                <option value="cosmic-purple">💫 Cosmic Purple</option>
+                            </optgroup>
+                            <optgroup label="✨ Premium Themes">
+                                <option value="rose-gold">🌹 Rose Gold</option>
+                                <option value="golden-hour">🌇 Golden Hour</option>
+                                <option value="arctic">❄️ Arctic Ice</option>
+                            </optgroup>
+                            <optgroup label="♿ Accessibility">
+                                <option value="highcontrast">⬜ High Contrast</option>
+                                <option value="protanopia">🔴 Protanopia Friendly</option>
+                                <option value="deuteranopia">🟠 Deuteranopia Friendly</option>
+                            </optgroup>
                         </select>
                     </div>
                     
@@ -1798,7 +2069,12 @@
                 const delayFactor = Math.max(0, 1 - tendencies.reactionDelay * 2);
                 predictedY = currentY * (1 - delayFactor) + predictedY * delayFactor;
                 
-                return Math.max(40, Math.min(360, predictedY));
+                // Allow full range movement - paddle center can be from 40 (paddle top at 0) to 360 (paddle bottom at 320)
+                const paddleHeight = 80;
+                const canvasHeight = 400;
+                const minY = paddleHeight / 2;
+                const maxY = canvasHeight - paddleHeight / 2;
+                return Math.max(minY, Math.min(maxY, predictedY));
             }
             
             // Get AI target position based on learning
@@ -1815,37 +2091,50 @@
                 // Predict where player will be
                 const predictedPlayerY = this.predictPlayerPosition(playerY, ballY, ballVy);
                 
-                switch (adaptations.strategyPreference) {
-                    case 'exploit':
-                        // Target player's weak spots
-                        if (tendencies.weakestZone !== undefined) {
-                            const weakSpotY = tendencies.weakestZone * 50 + 25;
-                            targetY = weakSpotY * 0.6 + ballY * 0.4;
-                        }
-                        break;
-                        
-                    case 'challenge':
-                        // Play to player's strengths to provide good gameplay
-                        targetY = predictedPlayerY * 0.3 + ballY * 0.7;
-                        break;
-                        
-                    default: // 'balanced'
-                        // Mix of challenging and exploiting
-                        const exploitFactor = adaptations.targetingBias;
-                        if (exploitFactor > 0 && tendencies.weakestZone !== undefined) {
-                            const weakSpotY = tendencies.weakestZone * 50 + 25;
-                            targetY = weakSpotY * exploitFactor + ballY * (1 - exploitFactor);
-                        } else {
-                            targetY = predictedPlayerY * 0.2 + ballY * 0.8;
-                        }
+                // SAFETY CHECK: If ball is moving away from AI (toward player), default to ball tracking
+                if (ballVx < 0) {
+                    targetY = ballY + ballVy * 0.3; // Basic ball tracking
+                } else {
+                    // Ball is coming toward AI, apply learned behavior
+                    switch (adaptations.strategyPreference) {
+                        case 'exploit':
+                            // Target player's weak spots
+                            if (tendencies.weakestZone !== undefined) {
+                                const weakSpotY = tendencies.weakestZone * 50 + 25;
+                                targetY = weakSpotY * 0.4 + ballY * 0.6; // Reduced exploit factor
+                            }
+                            break;
+                            
+                        case 'challenge':
+                            // Play to player's strengths to provide good gameplay
+                            targetY = predictedPlayerY * 0.2 + ballY * 0.8; // More ball-focused
+                            break;
+                            
+                        default: // 'balanced'
+                            // Mix of challenging and exploiting
+                            const exploitFactor = Math.min(0.5, adaptations.targetingBias); // Cap exploit factor
+                            if (exploitFactor > 0 && tendencies.weakestZone !== undefined) {
+                                const weakSpotY = tendencies.weakestZone * 50 + 25;
+                                targetY = weakSpotY * exploitFactor + ballY * (1 - exploitFactor);
+                            } else {
+                                targetY = predictedPlayerY * 0.1 + ballY * 0.9; // More conservative
+                            }
+                    }
                 }
                 
                 // Add some unpredictability if player is too predictable
-                if (tendencies.predictability > 0.8 && Math.random() < 0.3) {
-                    targetY += (Math.random() - 0.5) * 60;
+                if (tendencies.predictability > 0.8 && Math.random() < 0.2) {
+                    targetY += (Math.random() - 0.5) * 40; // Reduced randomness
                 }
                 
-                return Math.max(40, Math.min(360, targetY));
+                // Ensure target is within screen bounds (but allow full range)
+                const canvasHeight = 400; // Standard game height
+                const paddleHeight = 80;
+                const minY = paddleHeight / 2; // Paddle center minimum (top of paddle at y=0)
+                const maxY = canvasHeight - paddleHeight / 2; // Paddle center maximum (bottom of paddle at y=320)
+                
+                // Only clamp if absolutely outside bounds (no artificial margins)
+                return Math.max(minY, Math.min(maxY, targetY));
             }
             
             // Utility function to predict next position based on pattern
@@ -2477,6 +2766,41 @@
                 let newTargetY = ballCenterY;
                 let speed = this.getDifficultySettings().aiSpeed;
                 
+                // Initialize AI stuck detection if not exists
+                if (!this.ai.stuckDetection) {
+                    this.ai.stuckDetection = {
+                        lastPosition: this.ai.y,
+                        stuckTimer: 0,
+                        resetThreshold: 2.0 // seconds
+                    };
+                }
+                
+                // Track if AI paddle is stuck
+                const positionDiff = Math.abs(this.ai.y - this.ai.stuckDetection.lastPosition);
+                if (positionDiff < 2) { // Less than 2 pixels movement
+                    this.ai.stuckDetection.stuckTimer += dt;
+                } else {
+                    this.ai.stuckDetection.stuckTimer = 0;
+                    this.ai.stuckDetection.lastPosition = this.ai.y;
+                }
+                
+                // If stuck for too long, reset AI position and ML data
+                if (this.ai.stuckDetection.stuckTimer > this.ai.stuckDetection.resetThreshold) {
+                    console.log('AI paddle stuck detected - resetting position and ML data');
+                    const centerY = this.canvas.height / 2 - this.ai.height / 2;
+                    this.ai.y = centerY;
+                    this.ai.targetY = ballCenterY;
+                    
+                    // Reset ML AI if it's the adaptive personality causing issues
+                    if (this.ai.personality === 'adaptive' && this.mlAI) {
+                        this.mlAI.learningModel.confidence = Math.max(0.2, this.mlAI.learningModel.confidence - 0.3);
+                        console.log('Reduced ML AI confidence due to stuck behavior');
+                    }
+                    
+                    this.ai.stuckDetection.stuckTimer = 0;
+                    this.ai.stuckDetection.lastPosition = this.ai.y;
+                }
+                
                 // Apply power-up effects
                 if (this.aiEffects.speedBoost > 0) speed *= 1.8;
                 if (this.aiEffects.freeze > 0) speed *= 0.2;
@@ -2534,6 +2858,8 @@
                 const moveAmount = Math.sign(difference) * Math.min(Math.abs(difference), maxMoveDistance);
                 
                 this.ai.y += moveAmount;
+                
+                // Normal bounds checking - allow full movement range
                 this.ai.y = Math.max(0, Math.min(this.canvas.height - this.ai.height, this.ai.y));
             }
             
@@ -3659,34 +3985,117 @@
         }
 
         // ===== UI FUNCTIONS =====
-        function showPanel(panelName) {
-            ['gameMenu', 'settingsPanel', 'statsPanel', 'helpPanel', 'aboutPanel', 'inGameUI', 'heatmapPanel', 'mlstatsPanel', 'analyticsPanel'].forEach(id => 
-                document.getElementById(id).style.display = 'none');
+        function showPanel(panelName, skipAnimation = false) {
+            const panels = ['gameMenu', 'settingsPanel', 'statsPanel', 'helpPanel', 'aboutPanel', 'inGameUI', 'heatmapPanel', 'mlstatsPanel', 'analyticsPanel'];
+            const currentVisiblePanel = panels.find(id => document.getElementById(id).style.display !== 'none');
+            
+            // If we have a visible panel and animations are enabled, slide it out first
+            if (currentVisiblePanel && !skipAnimation) {
+                const currentElement = document.getElementById(currentVisiblePanel);
+                currentElement.classList.add('slide-out');
+                
+                // Wait for slide out animation to complete before showing new panel
+                setTimeout(() => {
+                    showPanelImmediate(panelName);
+                }, 300);
+            } else {
+                showPanelImmediate(panelName);
+            }
+            
+            audioSystem?.play('menuClick');
+        }
+        
+        function showPanelImmediate(panelName) {
+            const panels = ['gameMenu', 'settingsPanel', 'statsPanel', 'helpPanel', 'aboutPanel', 'inGameUI', 'heatmapPanel', 'mlstatsPanel', 'analyticsPanel'];
+            
+            // Hide all panels and remove animation classes
+            panels.forEach(id => {
+                const element = document.getElementById(id);
+                element.style.display = 'none';
+                element.classList.remove('slide-out');
+            });
             
             currentPanel = panelName;
             
+            // Show the requested panel with fresh animation
+            let targetElement;
             switch (panelName) {
-                case 'menu': document.getElementById('gameMenu').style.display = 'block'; gameEngine.gameState = 'menu'; break;
-                case 'settings': document.getElementById('settingsPanel').style.display = 'block'; updateSettingsUI(); break;
-                case 'stats': updateStatsPanel(); document.getElementById('statsPanel').style.display = 'block'; break;
-                case 'help': document.getElementById('helpPanel').style.display = 'block'; break;
-                case 'about': document.getElementById('aboutPanel').style.display = 'block'; break;
-                case 'game': document.getElementById('inGameUI').style.display = 'block'; break;
+                case 'menu': 
+                    targetElement = document.getElementById('gameMenu');
+                    gameEngine.gameState = 'menu'; 
+                    break;
+                case 'settings': 
+                    targetElement = document.getElementById('settingsPanel');
+                    updateSettingsUI(); 
+                    break;
+                case 'stats': 
+                    updateStatsPanel();
+                    targetElement = document.getElementById('statsPanel');
+                    break;
+                case 'help': 
+                    targetElement = document.getElementById('helpPanel');
+                    break;
+                case 'about': 
+                    targetElement = document.getElementById('aboutPanel');
+                    break;
+                case 'game': 
+                    targetElement = document.getElementById('inGameUI');
+                    initMobileControls();
+                    break;
                 case 'heatmap': 
-                    document.getElementById('heatmapPanel').style.display = 'block'; 
-                    // Initialize heat map when panel is shown
-                    setTimeout(() => updateHeatMap(), 100);
+                    targetElement = document.getElementById('heatmapPanel');
+                    setTimeout(() => updateHeatMap(), 150);
                     break;
                 case 'mlstats':
-                    document.getElementById('mlstatsPanel').style.display = 'block';
+                    targetElement = document.getElementById('mlstatsPanel');
                     updateMLStatsPanel();
                     break;
                 case 'analytics':
-                    document.getElementById('analyticsPanel').style.display = 'block';
-                    setTimeout(() => initializeAnalyticsCharts(), 100);
+                    targetElement = document.getElementById('analyticsPanel');
+                    setTimeout(() => initializeAnalyticsCharts(), 150);
                     break;
             }
-            audioSystem?.play('menuClick');
+            
+            if (targetElement) {
+                targetElement.style.display = 'block';
+                // Trigger reflow to ensure animation plays
+                targetElement.offsetHeight;
+            }
+        }
+        
+        // Initialize mobile-specific controls
+        function initMobileControls() {
+            if (isMobileDevice()) {
+                // Enhance touch controls for mobile
+                canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+                canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+                canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+            }
+        }
+        
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   (window.innerWidth <= 768 && 'ontouchstart' in window);
+        }
+        
+        let touchStartY = 0;
+        function handleTouchStart(e) {
+            if (gameEngine.gameState !== 'playing') return;
+            touchStartY = e.touches[0].clientY;
+        }
+        
+        function handleTouchMove(e) {
+            if (gameEngine.gameState !== 'playing') return;
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touchY = e.touches[0].clientY - rect.top;
+            const scaleY = canvas.height / rect.height;
+            const gameY = touchY * scaleY;
+            gameEngine.player.y = Math.max(0, Math.min(canvas.height - gameEngine.player.height, gameY - gameEngine.player.height / 2));
+        }
+        
+        function handleTouchEnd(e) {
+            // Could add touch gestures here
         }
 
         function startGame(mode) {
@@ -4024,7 +4433,16 @@
                 crimson: {bg: 'linear-gradient(135deg, #330000, #660000, #990000)', primary: '#ff3366', secondary: '#cc0033'},
                 highcontrast: {bg: 'linear-gradient(135deg, #ffffff, #f0f0f0)', primary: '#000000', secondary: '#333333'},
                 protanopia: {bg: 'linear-gradient(135deg, #0066cc, #004499)', primary: '#ffaa00', secondary: '#0088ff'},
-                deuteranopia: {bg: 'linear-gradient(135deg, #cc6600, #994400)', primary: '#0066ff', secondary: '#ffcc00'}
+                deuteranopia: {bg: 'linear-gradient(135deg, #cc6600, #994400)', primary: '#0066ff', secondary: '#ffcc00'},
+                // New themes
+                midnight: {bg: 'linear-gradient(135deg, #000428, #004e92)', primary: '#00d4ff', secondary: '#0099cc'},
+                'aurora-green': {bg: 'linear-gradient(135deg, #00f260, #0575e6)', primary: '#00ff88', secondary: '#00ccff'},
+                'rose-gold': {bg: 'linear-gradient(135deg, #f093fb, #f5576c)', primary: '#ff69b4', secondary: '#ff1493'},
+                'deep-space': {bg: 'linear-gradient(135deg, #0c0c0c, #1a0033, #4a0080)', primary: '#9966ff', secondary: '#cc66ff'},
+                'golden-hour': {bg: 'linear-gradient(135deg, #ff9a9e, #fecfef)', primary: '#ff6b6b', secondary: '#ffa726'},
+                'electric-blue': {bg: 'linear-gradient(135deg, #667eea, #764ba2)', primary: '#4fc3f7', secondary: '#29b6f6'},
+                emerald: {bg: 'linear-gradient(135deg, #11998e, #38ef7d)', primary: '#00e676', secondary: '#26a69a'},
+                'cosmic-purple': {bg: 'linear-gradient(135deg, #667db6, #0082c8, #667db6)', primary: '#ab47bc', secondary: '#7e57c2'}
             };
             const t = themes[theme] || themes.neon;
             document.body.style.background = t.bg;
