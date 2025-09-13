@@ -22,6 +22,7 @@
     
     <!-- Chart.js for Analytics Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./version-manager.js"></script>
     
     <style>
         :root {
@@ -631,40 +632,11 @@
             <div id="aboutPanel" class="menu-panel" style="display: none;">
                 <h2 style="color: var(--primary-color); margin-bottom: 20px;">ℹ️ About Enhanced Pong</h2>
                 
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h3 style="color: var(--secondary-color); margin-bottom: 5px;">🎮 Enhanced Pong - Ultimate Edition</h3>
-                    <p style="margin: 5px 0; color: #aaa;">Version 1.2.0</p>
-                    <p style="margin: 5px 0; font-weight: bold;">Created by <span style="color: var(--primary-color);">ShadowHarvy</span></p>
-                </div>
-                
-                <div style="text-align: left; font-size: 13px; margin-bottom: 20px;">
-                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <h4 style="color: var(--primary-color); margin-top: 0;">🚀 What Makes This Special</h4>
-                        <p>• <strong>8 AI Personalities</strong> including machine learning adaptive AI</p>
-                        <p>• <strong>Advanced Analytics</strong> with heat maps and performance tracking</p>
-                        <p>• <strong>15+ Achievements</strong> including tournament-specific rewards</p>
-                        <p>• <strong>Tournament System</strong> with leaderboards and rankings</p>
-                        <p>• <strong>16 Visual Themes</strong> including accessibility options</p>
-                        <p>• <strong>15 Background Effects</strong> from Matrix to Lightning Storm</p>
-                        <p>• <strong>6 Game Modes</strong> for varied gameplay experiences</p>
-                    </div>
-                    
-                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <h4 style="color: var(--secondary-color); margin-top: 0;">🗺️ Development Roadmap</h4>
-                        <p><strong>✅ v1.2.0:</strong> 🏆 Enhanced Tournament System & Achievements (COMPLETED)</p>
-                        <p><strong>Next (v1.3.0):</strong> 📊 Analytics Dashboard Integration</p>
-                        <p><strong>v1.4.0:</strong> 📱 Mobile Optimization & Accessibility</p>
-                        <p><strong>v1.5.0:</strong> 🌐 Online Multiplayer & Replay System</p>
-                        <p><strong>v1.6.0:</strong> 🎆 Advanced Features & Customization</p>
-                    </div>
-                    
-                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
-                        <h4 style="color: var(--primary-color); margin-top: 0;">👨‍💻 About the Developer</h4>
-                        <p><strong>ShadowHarvy</strong> is a backend developer with a passion for security and a growing interest in game development. This project represents an exploration into frontend technologies and AI-driven gameplay mechanics.</p>
-                        <p style="margin-top: 10px;"><strong>Background:</strong> 🖥️ Backend Development • 🔒 Security Enthusiast • 🎮 Aspiring Game Developer</p>
-                        <p><strong>Platform:</strong> Linux (CachyOS) • Multi-browser support</p>
-                        <p><strong>Tech Stack:</strong> HTML5 Canvas, JavaScript ES6+, Web Audio API, Machine Learning</p>
-                        <p style="margin-top: 10px; font-style: italic;">"Bridging backend expertise with creative game development!"</p>
+                <div id="aboutContent">
+                    <!-- Content will be dynamically loaded by version-manager.js -->
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3 style="color: var(--secondary-color); margin-bottom: 5px;">🎮 Enhanced Pong - Ultimate Edition</h3>
+                        <p style="margin: 5px 0; color: #aaa;">Loading version information...</p>
                     </div>
                 </div>
                 

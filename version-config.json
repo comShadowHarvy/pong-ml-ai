@@ -1,0 +1,110 @@
+{
+  "version": "1.2.0",
+  "releaseDate": "2025-09-13",
+  "codename": "Tournament Champion",
+  "description": "Enhanced Pong - Ultimate Edition",
+  "author": "ShadowHarvy",
+  "features": {
+    "aiPersonalities": 8,
+    "achievements": "15+",
+    "themes": 16,
+    "backgroundEffects": 15,
+    "gameModes": 6,
+    "newFeatures": [
+      "Tournament System with leaderboards and rankings",
+      "15+ achievements including tournament rewards",
+      "5-round championship with progressive AI difficulty",
+      "Global leaderboards with player statistics",
+      "Tournament analytics and performance tracking"
+    ]
+  },
+  "roadmap": {
+    "completed": [
+      {
+        "version": "1.0.0",
+        "date": "2025-09-10",
+        "features": ["Initial release", "8 AI Personalities", "Advanced Analytics", "14 Achievements"]
+      },
+      {
+        "version": "1.2.0",
+        "date": "2025-09-13",
+        "features": ["Tournament System", "Achievement Expansion", "Rankings System", "Tournament Analytics"]
+      }
+    ],
+    "upcoming": [
+      {
+        "version": "1.3.0",
+        "title": "Analytics Dashboard Integration",
+        "features": ["Beautiful Chart.js visualizations", "Performance graphs", "Enhanced statistics"]
+      },
+      {
+        "version": "1.4.0",
+        "title": "Mobile Optimization & Accessibility",
+        "features": ["Touch controls optimization", "Screen reader support", "Mobile-first design"]
+      },
+      {
+        "version": "1.5.0",
+        "title": "Online Multiplayer & Replay System",
+        "features": ["Real-time multiplayer", "Match replay system", "Spectator mode"]
+      },
+      {
+        "version": "1.6.0",
+        "title": "Advanced Features & Customization",
+        "features": ["Theme editor", "Custom game modes", "Mod support"]
+      }
+    ]
+  },
+  "updateTargets": [
+    {
+      "file": "enhanced-pong.html",
+      "locations": [
+        {
+          "type": "version",
+          "selector": "about-panel-version",
+          "pattern": "Version {{version}}"
+        },
+        {
+          "type": "features",
+          "selector": "about-panel-features",
+          "template": "features-list"
+        },
+        {
+          "type": "roadmap",
+          "selector": "about-panel-roadmap",
+          "template": "roadmap-list"
+        }
+      ]
+    },
+    {
+      "file": "README.md",
+      "locations": [
+        {
+          "type": "badge",
+          "pattern": "![Version](https://img.shields.io/badge/version-{{version}}-blue.svg)"
+        },
+        {
+          "type": "features",
+          "section": "Achievement & Tournament System"
+        }
+      ]
+    },
+    {
+      "file": "sw.js",
+      "locations": [
+        {
+          "type": "cache",
+          "pattern": "const CACHE_NAME = 'enhanced-pong-v{{version}}';"
+        }
+      ]
+    },
+    {
+      "file": "manifest.json",
+      "locations": [
+        {
+          "type": "version",
+          "field": "version"
+        }
+      ]
+    }
+  ]
+}

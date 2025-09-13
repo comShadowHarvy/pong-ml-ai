@@ -6,6 +6,8 @@ const urlsToCache = [
   './pong.html',
   './achievement-system.js',
   './leaderboard-system.js',
+  './version-manager.js',
+  './version-config.json',
   './manifest.json',
   './favicon-16x16.png',
   './favicon-32x32.png',
