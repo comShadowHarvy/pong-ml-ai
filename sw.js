@@ -1,9 +1,11 @@
-const CACHE_NAME = 'enhanced-pong-v1.0.0';
+const CACHE_NAME = 'enhanced-pong-v1.2.0';
 const urlsToCache = [
   './',
   './index.html',
   './enhanced-pong.html',
   './pong.html',
+  './achievement-system.js',
+  './leaderboard-system.js',
   './manifest.json',
   './favicon-16x16.png',
   './favicon-32x32.png',
