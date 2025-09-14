@@ -1,6 +1,7 @@
 {
   "name": "Enhanced Pong - ML AI Game",
   "short_name": "Enhanced Pong",
+  "version": "1.6.0",
   "description": "Classic Pong game with Machine Learning AI opponent that adapts to your play style. Features multiple game modes, themes, and comprehensive statistics.",
   "start_url": "./",
   "display": "fullscreen",

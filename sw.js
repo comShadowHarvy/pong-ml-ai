@@ -1,4 +1,4 @@
-const CACHE_NAME = 'enhanced-pong-v1.5.5';
+const CACHE_NAME = 'enhanced-pong-v1.6.0';
 const urlsToCache = [
   './',
   './index.html',

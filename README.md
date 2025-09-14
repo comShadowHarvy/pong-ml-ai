@@ -4,7 +4,7 @@
 
 A modern, feature-rich Pong game with advanced AI, machine learning, analytics, and stunning visual effects.
 
-![Version](https://img.shields.io/badge/version-1.5.5-blue.svg)
+![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Web-green.svg)
 ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red.svg)
 
