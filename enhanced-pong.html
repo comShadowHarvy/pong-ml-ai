@@ -384,6 +384,178 @@
             border-color: var(--primary-color);
         }
         
+        /* Tournament Bracket Styles */
+        .tournament-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .tournament-header {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .tournament-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 12px;
+        }
+        
+        .tournament-bracket {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            min-height: 300px;
+            overflow-x: auto;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .bracket-round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-width: 180px;
+            margin: 0 10px;
+        }
+        
+        .bracket-container {
+            display: flex;
+            align-items: center;
+            min-height: 300px;
+        }
+        
+        .bracket-match {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .bracket-match:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .bracket-match.completed {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .bracket-match.current {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .bracket-player {
+            padding: 4px 8px;
+            margin: 2px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .bracket-player.winner {
+            background: rgba(78, 205, 196, 0.3);
+            color: var(--primary-color);
+        }
+        
+        .bracket-player.loser {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .bracket-connector {
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 2px;
+            background: var(--primary-color);
+        }
+        
+        .bracket-connector.vertical {
+            width: 2px;
+            height: 40px;
+            right: -8px;
+        }
+        
+        .round-label {
+            text-align: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .tournament-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .tournament-preview {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .tournament-preview h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .preview-round {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+        }
+        
+        .preview-round:last-child {
+            border-bottom: none;
+        }
+        
+        .ai-personality-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        
+        .difficulty-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 4px;
+        }
+        
+        .difficulty-easy { background-color: #4CAF50; }
+        .difficulty-medium { background-color: #FF9800; }
+        .difficulty-hard { background-color: #F44336; }
+        .difficulty-expert { background-color: #9C27B0; }
+        
         .no-data-message {
             text-align: center;
             color: rgba(255,255,255,0.7);
@@ -599,8 +771,9 @@
                 <div class="game-modes">
                     <button class="menu-btn" onclick="startGame('classic')">🎮 Classic</button>
                     <button class="menu-btn" onclick="startGame('speedball')">⚡ Speedball</button>
-                    <button class="menu-btn" onclick="startGame('survival')">💀 Survival</button>
+                    <button class="menu-btn" onclick="startGame('survival')">❤️ Survival</button>
                     <button class="menu-btn" onclick="startGame('tournament')">🏆 Tournament</button>
+                    <button class="menu-btn" onclick="showPanel('tournamentBracket')">🏆 Tournament Bracket</button>
                     <button class="menu-btn" onclick="startGame('practice')">🎯 Practice</button>
                     <button class="menu-btn" onclick="startGame('multiplayer')">👥 Multiplayer</button>
                 </div>
@@ -801,6 +974,91 @@
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
                     <button class="menu-btn secondary" onclick="resetMLAI()">🗑️ Reset ML AI</button>
                     <button class="menu-btn secondary" onclick="showPanel('stats')">🔙 Back</button>
+                </div>
+            </div>
+            
+            <!-- Tournament Bracket Panel -->
+            <div id="tournamentBracketPanel" class="menu-panel" style="display: none;">
+                <h2 style="color: var(--primary-color); margin-bottom: 20px;">🏆 Tournament Bracket</h2>
+                
+                <div class="tournament-info">
+                    <div id="tournamentProgress" class="tournament-header"></div>
+                    <div id="tournamentSettings" class="tournament-settings"></div>
+                </div>
+                
+                <div id="tournamentBracket" class="tournament-bracket">
+                    <!-- Bracket visualization will be dynamically generated -->
+                </div>
+                
+                <div id="tournamentControls" class="tournament-controls">
+                    <button class="menu-btn" onclick="startNextTournamentRound()" id="nextRoundBtn" style="display: none;">▶️ Next Round</button>
+                    <button class="menu-btn secondary" onclick="saveTournamentProgress()">💾 Save Progress</button>
+                    <button class="menu-btn secondary" onclick="customizeTournament()">⚙️ Customize</button>
+                    <button class="menu-btn secondary" onclick="showPanel('menu')">🔙 Back to Menu</button>
+                </div>
+            </div>
+            
+            <!-- Tournament Customization Panel -->
+            <div id="tournamentCustomizePanel" class="menu-panel" style="display: none;">
+                <h2 style="color: var(--primary-color); margin-bottom: 20px;">⚙️ Tournament Settings</h2>
+                
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label>Tournament Size:</label>
+                        <select id="tournamentSize" onchange="updateTournamentPreview()">
+                            <option value="4">4 Rounds (Quick)</option>
+                            <option value="8" selected>8 Rounds (Standard)</option>
+                            <option value="16">16 Rounds (Championship)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>Bracket Format:</label>
+                        <select id="bracketFormat" onchange="updateTournamentPreview()">
+                            <option value="single" selected>Single Elimination</option>
+                            <option value="double">Double Elimination</option>
+                            <option value="roundrobin">Round Robin</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>Difficulty Progression:</label>
+                        <select id="difficultyProgression">
+                            <option value="linear">Linear (Easy → Hard)</option>
+                            <option value="adaptive" selected>Adaptive (Based on Performance)</option>
+                            <option value="random">Random Mix</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>AI Personality Selection:</label>
+                        <select id="aiPersonalityMode">
+                            <option value="progressive" selected>Progressive Difficulty</option>
+                            <option value="random">Random Each Round</option>
+                            <option value="custom">Custom Selection</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>Match Length:</label>
+                        <select id="matchLength">
+                            <option value="3">Best of 3</option>
+                            <option value="5">Best of 5</option>
+                            <option value="7" selected>Best of 7 (Standard)</option>
+                            <option value="9">Best of 9 (Championship)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="tournamentPreview" class="tournament-preview">
+                    <h4>Tournament Preview:</h4>
+                    <div id="previewContent"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                    <button class="menu-btn" onclick="createCustomTournament()">🚀 Start Tournament</button>
+                    <button class="menu-btn secondary" onclick="resetTournamentSettings()">🔄 Reset</button>
+                    <button class="menu-btn secondary" onclick="showPanel('menu')">🔙 Back</button>
                 </div>
             </div>
             
@@ -2682,7 +2940,13 @@
                         'ai_tamer': {title: '🤖 AI Tamer', description: 'Beat all AI personalities', condition: () => this.checkAllPersonalitiesBeaten()},
                         'marathon': {title: '🏃‍♂️ Marathon Player', description: 'Play 100 games', condition: () => this.stats.gamesPlayed >= 100},
                         'dedication': {title: '⏰ Dedicated', description: 'Play for 60+ minutes total', condition: () => this.stats.totalPlayTime >= 3600000},
-                        'comeback_king': {title: '👑 Comeback King', description: 'Win after being 5+ points behind', condition: () => this.stats.comebacks >= 1}
+                        'comeback_king': {title: '👑 Comeback King', description: 'Win after being 5+ points behind', condition: () => this.stats.comebacks >= 1},
+                        'tournament_winner': {title: '🏆 Tournament Champion', description: 'Win your first tournament', condition: () => this.checkTournamentVictory()},
+                        'round_warrior': {title: '⚔️ Round Warrior', description: 'Reach tournament semi-finals', condition: () => this.checkTournamentRound(2)},
+                        'bracket_buster': {title: '💥 Bracket Buster', description: 'Complete 5 tournaments', condition: () => this.checkTournamentCount(5)},
+                        'tournament_master': {title: '👑 Tournament Master', description: 'Win 3 tournaments', condition: () => this.checkTournamentWins(3)},
+                        'perfect_bracket': {title: '✨ Perfect Bracket', description: 'Win tournament without losing a match', condition: () => this.checkPerfectTournament()},
+                        'ai_dominator': {title: '🤖 AI Dominator', description: 'Defeat all AI personalities in tournaments', condition: () => this.checkAllTournamentPersonalities()}
                     },
                     newlyUnlocked: [] // For showing achievement notifications
                 };
@@ -2697,6 +2961,13 @@
                 if (!this.stats.comebacks) this.stats.comebacks = 0;
                 if (!this.stats.totalPlayTime) this.stats.totalPlayTime = 0;
                 if (!this.stats.gameStartTime) this.stats.gameStartTime = 0;
+                
+                // Tournament-specific stats
+                if (!this.stats.tournamentsPlayed) this.stats.tournamentsPlayed = 0;
+                if (!this.stats.tournamentWins) this.stats.tournamentWins = 0;
+                if (!this.stats.tournamentBestRound) this.stats.tournamentBestRound = 0;
+                if (!this.stats.perfectTournaments) this.stats.perfectTournaments = 0;
+                if (!this.stats.tournamentPersonalitiesBeaten) this.stats.tournamentPersonalitiesBeaten = new Set();
                 
                 // Analytics tracking variables
                 this.lastBallDirectionChange = 0;
@@ -3161,6 +3432,15 @@
                 // Check achievements after game ends
                 this.checkAchievements();
                 
+                // Handle tournament match completion
+                if (this.gameMode === 'tournament' && enhancedTournamentSystem && enhancedTournamentSystem.currentMatch) {
+                    const finalScore = { player: this.player.score, opponent: this.ai.score };
+                    enhancedTournamentSystem.completeMatch(true, finalScore);
+                    
+                    // Don't auto-reset for tournaments - let tournament system handle flow
+                    return;
+                }
+                
                 setTimeout(() => this.resetGame(), 3000);
             }
             
@@ -3198,6 +3478,15 @@
                 
                 // Check achievements even on loss (some achievements might be reached)
                 this.checkAchievements();
+                
+                // Handle tournament match completion
+                if (this.gameMode === 'tournament' && enhancedTournamentSystem && enhancedTournamentSystem.currentMatch) {
+                    const finalScore = { player: this.player.score, opponent: this.ai.score };
+                    enhancedTournamentSystem.completeMatch(false, finalScore);
+                    
+                    // Don't auto-reset for tournaments - let tournament system handle flow
+                    return;
+                }
                 
                 setTimeout(() => this.resetGame(), 3000);
             }
@@ -3794,6 +4083,32 @@
                 return personalities.every(personality => this.stats.personalitiesBeaten.has(personality));
             }
             
+            checkTournamentVictory() {
+                return (this.stats.tournamentWins || 0) >= 1;
+            }
+            
+            checkTournamentRound(targetRound) {
+                return (this.stats.tournamentBestRound || 0) >= targetRound;
+            }
+            
+            checkTournamentCount(count) {
+                return (this.stats.tournamentsPlayed || 0) >= count;
+            }
+            
+            checkTournamentWins(wins) {
+                return (this.stats.tournamentWins || 0) >= wins;
+            }
+            
+            checkPerfectTournament() {
+                return (this.stats.perfectTournaments || 0) >= 1;
+            }
+            
+            checkAllTournamentPersonalities() {
+                const tournamentPersonalities = this.stats.tournamentPersonalitiesBeaten || new Set();
+                const personalities = ['balanced', 'defensive', 'aggressive', 'perfect', 'unpredictable', 'trickster', 'copycat', 'adaptive'];
+                return personalities.every(personality => tournamentPersonalities.has(personality));
+            }
+            
             getStats() {
                 return {
                     ...this.stats,
@@ -3818,6 +4133,7 @@
             backgroundEffect = new BackgroundEffect(ctx, canvas);
             gameEngine = new GameEngine(canvas, ctx);
             heatMapVisualizer = new HeatMapVisualizer();
+            enhancedTournamentSystem = new EnhancedTournamentSystem();
             
             // Initialize heat map visualizer after DOM is ready
             heatMapVisualizer.initialize('heatmapCanvas');
@@ -4053,6 +4369,14 @@
                 case 'analytics':
                     targetElement = document.getElementById('analyticsPanel');
                     setTimeout(() => initializeAnalyticsCharts(), 150);
+                    break;
+                case 'tournamentBracket':
+                    targetElement = document.getElementById('tournamentBracketPanel');
+                    setTimeout(() => showTournamentBracket(), 50);
+                    break;
+                case 'tournamentCustomize':
+                    targetElement = document.getElementById('tournamentCustomizePanel');
+                    setTimeout(() => updateTournamentPreview(), 50);
                     break;
             }
             
@@ -4869,6 +5193,347 @@
             }
         }
         
+        // ===== ENHANCED TOURNAMENT SYSTEM =====
+        
+        class EnhancedTournamentSystem {
+            constructor() {
+                this.currentTournament = null;
+                this.tournamentSettings = {
+                    size: 8,
+                    format: 'single', // single, double, roundrobin
+                    difficultyProgression: 'adaptive',
+                    aiPersonalityMode: 'progressive',
+                    matchLength: 7
+                };
+                this.loadTournamentProgress();
+            }
+            
+            createTournament(settings = {}) {
+                this.tournamentSettings = { ...this.tournamentSettings, ...settings };
+                
+                const tournament = {
+                    id: Date.now(),
+                    startTime: new Date().toISOString(),
+                    settings: { ...this.tournamentSettings },
+                    format: this.tournamentSettings.format,
+                    totalRounds: this.calculateTotalRounds(this.tournamentSettings.size),
+                    currentRound: 0,
+                    brackets: this.generateBrackets(this.tournamentSettings.size),
+                    matches: [],
+                    isComplete: false,
+                    playerProgress: {
+                        roundsWon: 0,
+                        totalMatches: 0,
+                        matchesWon: 0,
+                        opponentsDefeated: [],
+                        achievements: []
+                    }
+                };
+                
+                this.currentTournament = tournament;
+                this.saveTournamentProgress();
+                return tournament;
+            }
+            
+            calculateTotalRounds(size) {
+                return Math.ceil(Math.log2(size));
+            }
+            
+            generateBrackets(size) {
+                const aiPersonalities = ['balanced', 'defensive', 'aggressive', 'perfect', 'unpredictable', 'trickster', 'copycat', 'adaptive'];
+                const brackets = [];
+                
+                // Generate AI opponents for each round
+                for (let round = 0; round < this.calculateTotalRounds(size); round++) {
+                    const roundBrackets = [];
+                    const opponentsInRound = Math.pow(2, this.calculateTotalRounds(size) - round - 1);
+                    
+                    for (let i = 0; i < opponentsInRound; i++) {
+                        let personality, difficulty;
+                        
+                        switch (this.tournamentSettings.aiPersonalityMode) {
+                            case 'progressive':
+                                personality = this.getProgressivePersonality(round, i);
+                                difficulty = this.getProgressiveDifficulty(round);
+                                break;
+                            case 'random':
+                                personality = aiPersonalities[Math.floor(Math.random() * aiPersonalities.length)];
+                                difficulty = ['easy', 'medium', 'hard', 'expert'][Math.floor(Math.random() * 4)];
+                                break;
+                            case 'custom':
+                                personality = this.getCustomPersonality(round, i);
+                                difficulty = this.getCustomDifficulty(round, i);
+                                break;
+                        }
+                        
+                        roundBrackets.push({
+                            id: `R${round}-M${i}`,
+                            round: round,
+                            position: i,
+                            player: 'Player',
+                            opponent: {
+                                name: this.generateOpponentName(personality),
+                                personality: personality,
+                                difficulty: difficulty
+                            },
+                            status: round === 0 ? 'ready' : 'locked',
+                            winner: null,
+                            score: null,
+                            matchHistory: []
+                        });
+                    }
+                    
+                    brackets.push(roundBrackets);
+                }
+                
+                return brackets;
+            }
+            
+            getProgressivePersonality(round, position) {
+                const progressiveOrder = [
+                    ['balanced', 'defensive'],
+                    ['aggressive', 'unpredictable'], 
+                    ['trickster', 'copycat'],
+                    ['perfect', 'adaptive']
+                ];
+                
+                const roundPersonalities = progressiveOrder[Math.min(round, progressiveOrder.length - 1)];
+                return roundPersonalities[position % roundPersonalities.length];
+            }
+            
+            getProgressiveDifficulty(round) {
+                const difficulties = ['easy', 'medium', 'hard', 'expert'];
+                return difficulties[Math.min(round, difficulties.length - 1)];
+            }
+            
+            generateOpponentName(personality) {
+                const names = {
+                    balanced: ['Balanced Bob', 'Steady Sam', 'Consistent Carl'],
+                    defensive: ['Guardian Gary', 'Defender Dan', 'Shield Sarah'],
+                    aggressive: ['Attacker Alex', 'Blitz Betty', 'Rush Ryan'],
+                    perfect: ['Perfect Pete', 'Flawless Fiona', 'Precision Paul'],
+                    unpredictable: ['Wild Willie', 'Chaos Charlie', 'Random Rita'],
+                    trickster: ['Tricky Tom', 'Deceptive Dave', 'Sneaky Sue'],
+                    copycat: ['Mimic Mike', 'Echo Emma', 'Clone Chris'],
+                    adaptive: ['Learning Larry', 'Smart Sally', 'Evolving Eve']
+                };
+                
+                const nameList = names[personality] || ['Mystery Player'];
+                return nameList[Math.floor(Math.random() * nameList.length)];
+            }
+            
+            startNextRound() {
+                if (!this.currentTournament || this.currentTournament.isComplete) return false;
+                
+                const currentRound = this.currentTournament.currentRound;
+                const roundMatches = this.currentTournament.brackets[currentRound];
+                
+                if (!roundMatches || roundMatches.length === 0) {
+                    this.completeTournament();
+                    return false;
+                }
+                
+                // Find next available match
+                const nextMatch = roundMatches.find(match => match.status === 'ready');
+                if (nextMatch) {
+                    return this.startMatch(nextMatch);
+                }
+                
+                return false;
+            }
+            
+            startMatch(match) {
+                // Set up game engine for tournament match
+                gameEngine.setGameMode('tournament');
+                gameEngine.setAIPersonality(match.opponent.personality);
+                gameEngine.settings.winScore = this.tournamentSettings.matchLength;
+                
+                // Store current match reference
+                this.currentMatch = match;
+                match.status = 'playing';
+                
+                // Start the game
+                gameEngine.gameState = 'playing';
+                showPanel('game');
+                document.getElementById('gameModeDisplay').textContent = 
+                    `TOURNAMENT - Round ${match.round + 1} vs ${match.opponent.name}`;
+                
+                audioSystem?.play('gameStart');
+                this.saveTournamentProgress();
+                return true;
+            }
+            
+            completeMatch(playerWon, finalScore) {
+                if (!this.currentMatch) return;
+                
+                const match = this.currentMatch;
+                match.status = 'completed';
+                match.winner = playerWon ? 'Player' : match.opponent.name;
+                match.score = finalScore;
+                match.matchHistory.push({
+                    timestamp: new Date().toISOString(),
+                    playerScore: finalScore.player,
+                    opponentScore: finalScore.opponent,
+                    duration: Date.now() - new Date(match.startTime || Date.now()).getTime()
+                });
+                
+                // Update tournament progress
+                this.currentTournament.playerProgress.totalMatches++;
+                if (playerWon) {
+                    this.currentTournament.playerProgress.matchesWon++;
+                    this.currentTournament.playerProgress.opponentsDefeated.push(match.opponent.personality);
+                    
+                    // Advance to next round if this was the last match in current round
+                    this.checkRoundCompletion();
+                } else {
+                    // Player eliminated
+                    this.eliminatePlayer();
+                }
+                
+                this.currentMatch = null;
+                this.saveTournamentProgress();
+                this.updateTournamentDisplay();
+            }
+            
+            checkRoundCompletion() {
+                const currentRound = this.currentTournament.currentRound;
+                const roundMatches = this.currentTournament.brackets[currentRound];
+                
+                // Check if all matches in current round are completed and player won
+                const playerWonRound = roundMatches.every(match => match.winner === 'Player');
+                
+                if (playerWonRound) {
+                    this.currentTournament.playerProgress.roundsWon++;
+                    this.currentTournament.currentRound++;
+                    
+                    // Check if tournament is complete
+                    if (this.currentTournament.currentRound >= this.currentTournament.totalRounds) {
+                        this.completeTournament(true);
+                    } else {
+                        this.unlockNextRound();
+                    }
+                }
+            }
+            
+            unlockNextRound() {
+                const nextRound = this.currentTournament.currentRound;
+                if (nextRound < this.currentTournament.brackets.length) {
+                    this.currentTournament.brackets[nextRound].forEach(match => {
+                        match.status = 'ready';
+                    });
+                }
+            }
+            
+            eliminatePlayer() {
+                this.currentTournament.isComplete = true;
+                this.currentTournament.result = 'eliminated';
+                this.currentTournament.endTime = new Date().toISOString();
+                
+                // Record tournament result
+                if (leaderboardSystem) {
+                    leaderboardSystem.recordTournamentResult({
+                        matchesWon: this.currentTournament.playerProgress.matchesWon,
+                        totalMatches: this.currentTournament.playerProgress.totalMatches,
+                        isChampion: false,
+                        opponentsDefeated: this.currentTournament.playerProgress.opponentsDefeated,
+                        finalScore: this.currentTournament.playerProgress.matchesWon,
+                        tournamentType: 'enhanced',
+                        duration: Date.now() - new Date(this.currentTournament.startTime).getTime(),
+                        difficulty: 'progressive'
+                    });
+                }
+                
+                this.showTournamentResults(false);
+            }
+            
+            completeTournament(victory = true) {
+                this.currentTournament.isComplete = true;
+                this.currentTournament.result = victory ? 'champion' : 'eliminated';
+                this.currentTournament.endTime = new Date().toISOString();
+                
+                // Update game engine tournament stats
+                if (gameEngine && gameEngine.stats) {
+                    gameEngine.stats.tournamentsPlayed++;
+                    
+                    if (victory) {
+                        gameEngine.stats.tournamentWins++;
+                        
+                        // Check if perfect tournament (no losses)
+                        const totalLosses = this.currentTournament.playerProgress.totalMatches - this.currentTournament.playerProgress.matchesWon;
+                        if (totalLosses === 0) {
+                            gameEngine.stats.perfectTournaments++;
+                        }
+                    }
+                    
+                    // Update best round reached
+                    const roundsReached = this.currentTournament.playerProgress.roundsWon + (victory ? 0 : 1);
+                    if (roundsReached > gameEngine.stats.tournamentBestRound) {
+                        gameEngine.stats.tournamentBestRound = roundsReached;
+                    }
+                    
+                    // Track tournament personalities beaten
+                    this.currentTournament.playerProgress.opponentsDefeated.forEach(personality => {
+                        gameEngine.stats.tournamentPersonalitiesBeaten.add(personality);
+                    });
+                    
+                    // Save updated stats
+                    gameEngine.saveStats();
+                }
+                
+                // Record tournament result
+                if (leaderboardSystem) {
+                    leaderboardSystem.recordTournamentResult({
+                        matchesWon: this.currentTournament.playerProgress.matchesWon,
+                        totalMatches: this.currentTournament.playerProgress.totalMatches,
+                        isChampion: victory,
+                        opponentsDefeated: this.currentTournament.playerProgress.opponentsDefeated,
+                        finalScore: this.currentTournament.playerProgress.matchesWon,
+                        tournamentType: 'enhanced',
+                        duration: Date.now() - new Date(this.currentTournament.startTime).getTime(),
+                        difficulty: 'progressive'
+                    });
+                }
+                
+                this.showTournamentResults(victory);
+            }
+            
+            showTournamentResults(victory) {
+                const message = victory ? 
+                    `🏆 TOURNAMENT CHAMPION! 🏆\n\nRounds Won: ${this.currentTournament.playerProgress.roundsWon}\nMatches Won: ${this.currentTournament.playerProgress.matchesWon}/${this.currentTournament.playerProgress.totalMatches}\nOpponents Defeated: ${this.currentTournament.playerProgress.opponentsDefeated.length}` :
+                    `Tournament Over\n\nRounds Reached: ${this.currentTournament.playerProgress.roundsWon + 1}\nMatches Won: ${this.currentTournament.playerProgress.matchesWon}/${this.currentTournament.playerProgress.totalMatches}\nBetter luck next time!`;
+                
+                setTimeout(() => {
+                    alert(message);
+                    showPanel('menu');
+                }, 1000);
+            }
+            
+            loadTournamentProgress() {
+                const saved = localStorage.getItem('enhancedTournamentProgress');
+                if (saved) {
+                    try {
+                        this.currentTournament = JSON.parse(saved);
+                    } catch (e) {
+                        console.warn('Failed to load tournament progress:', e);
+                    }
+                }
+            }
+            
+            saveTournamentProgress() {
+                if (this.currentTournament) {
+                    localStorage.setItem('enhancedTournamentProgress', JSON.stringify(this.currentTournament));
+                }
+            }
+            
+            clearTournamentProgress() {
+                this.currentTournament = null;
+                localStorage.removeItem('enhancedTournamentProgress');
+            }
+        }
+        
+        // Global tournament system instance
+        let enhancedTournamentSystem = null;
+        
         // ===== ANALYTICS CHARTS SYSTEM =====
         
         function initializeAnalyticsCharts() {
@@ -5594,6 +6259,233 @@
             }
             
             audioSystem?.play('menuClick');
+        }
+        
+        // ===== TOURNAMENT UI FUNCTIONS =====
+        
+        function showTournamentBracket() {
+            if (!enhancedTournamentSystem.currentTournament) {
+                alert('No active tournament. Create a new tournament first!');
+                showPanel('tournamentCustomize');
+                return;
+            }
+            
+            updateTournamentDisplay();
+            showPanel('tournamentBracket');
+        }
+        
+        function updateTournamentDisplay() {
+            const tournament = enhancedTournamentSystem.currentTournament;
+            if (!tournament) return;
+            
+            // Update tournament progress header
+            const progressDiv = document.getElementById('tournamentProgress');
+            progressDiv.innerHTML = `
+                <h3>🏆 ${tournament.format.toUpperCase()} ELIMINATION TOURNAMENT</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 10px;">
+                    <div><strong>Round:</strong> ${tournament.currentRound + 1}/${tournament.totalRounds}</div>
+                    <div><strong>Matches Won:</strong> ${tournament.playerProgress.matchesWon}/${tournament.playerProgress.totalMatches}</div>
+                    <div><strong>Status:</strong> ${tournament.isComplete ? (tournament.result === 'champion' ? '🏆 Champion' : '❌ Eliminated') : '⚙️ In Progress'}</div>
+                </div>
+            `;
+            
+            // Update tournament settings display
+            const settingsDiv = document.getElementById('tournamentSettings');
+            settingsDiv.innerHTML = `
+                <div style="font-size: 11px; color: rgba(255,255,255,0.7);">
+                    <span>Format: ${tournament.settings.format}</span> • 
+                    <span>Size: ${tournament.settings.size} rounds</span> • 
+                    <span>Match Length: Best of ${tournament.settings.matchLength}</span>
+                </div>
+            `;
+            
+            // Generate bracket visualization
+            generateBracketVisualization(tournament);
+            
+            // Update controls
+            updateTournamentControls(tournament);
+        }
+        
+        function generateBracketVisualization(tournament) {
+            const bracketDiv = document.getElementById('tournamentBracket');
+            
+            let html = '<div class="bracket-container">';
+            
+            for (let roundIndex = 0; roundIndex < tournament.brackets.length; roundIndex++) {
+                const round = tournament.brackets[roundIndex];
+                const roundName = getRoundName(roundIndex, tournament.totalRounds);
+                
+                html += `<div class="bracket-round">`;
+                html += `<div class="round-label">${roundName}</div>`;
+                
+                round.forEach((match, matchIndex) => {
+                    const matchClass = getMatchClass(match, tournament.currentRound, roundIndex);
+                    
+                    html += `<div class="bracket-match ${matchClass}" onclick="viewMatchDetails('${match.id}')"`;
+                    if (match.status === 'ready' && roundIndex === tournament.currentRound) {
+                        html += ` style="cursor: pointer;"`;
+                    }
+                    html += `>`;
+                    
+                    // Player info
+                    html += `<div class="bracket-player ${match.winner === 'Player' ? 'winner' : (match.winner ? 'loser' : '')}">`;
+                    html += `👤 Player ${match.score ? `(${match.score.player})` : ''}</div>`;
+                    
+                    html += `<div style="font-size: 12px; color: rgba(255,255,255,0.5); margin: 2px 0;">vs</div>`;
+                    
+                    // Opponent info
+                    html += `<div class="bracket-player ${match.winner === match.opponent.name ? 'winner' : (match.winner ? 'loser' : '')}">`;
+                    html += `🤖 ${match.opponent.name}`;
+                    html += `<span class="ai-personality-badge">${match.opponent.personality}</span>`;
+                    html += `<span class="difficulty-indicator difficulty-${match.opponent.difficulty}"></span>`;
+                    if (match.score) html += ` (${match.score.opponent})`;
+                    html += `</div>`;
+                    
+                    if (match.status === 'ready' && roundIndex === tournament.currentRound) {
+                        html += `<div style="margin-top: 8px;"><button class="menu-btn" style="font-size: 11px; padding: 4px 8px;" onclick="startTournamentMatch('${match.id}')">Start Match</button></div>`;
+                    }
+                    
+                    html += `</div>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            html += '</div>';
+            bracketDiv.innerHTML = html;
+        }
+        
+        function getRoundName(roundIndex, totalRounds) {
+            const roundsFromEnd = totalRounds - roundIndex;
+            switch (roundsFromEnd) {
+                case 1: return 'FINAL';
+                case 2: return 'SEMI-FINAL';
+                case 3: return 'QUARTER-FINAL';
+                case 4: return 'ROUND OF 16';
+                default: return `ROUND ${roundIndex + 1}`;
+            }
+        }
+        
+        function getMatchClass(match, currentRound, roundIndex) {
+            if (match.status === 'completed') return 'completed';
+            if (match.status === 'playing') return 'current';
+            if (roundIndex === currentRound && match.status === 'ready') return 'current';
+            if (roundIndex > currentRound) return 'locked';
+            return '';
+        }
+        
+        function updateTournamentControls(tournament) {
+            const nextRoundBtn = document.getElementById('nextRoundBtn');
+            
+            if (tournament.isComplete) {
+                nextRoundBtn.style.display = 'none';
+            } else {
+                const hasReadyMatches = tournament.brackets[tournament.currentRound]?.some(match => match.status === 'ready');
+                nextRoundBtn.style.display = hasReadyMatches ? 'inline-block' : 'none';
+                nextRoundBtn.textContent = hasReadyMatches ? '▶️ Start Next Match' : '▶️ Next Round';
+            }
+        }
+        
+        function startTournamentMatch(matchId) {
+            const tournament = enhancedTournamentSystem.currentTournament;
+            if (!tournament) return;
+            
+            const match = tournament.brackets.flat().find(m => m.id === matchId);
+            if (match && match.status === 'ready') {
+                enhancedTournamentSystem.startMatch(match);
+            }
+        }
+        
+        function startNextTournamentRound() {
+            enhancedTournamentSystem.startNextRound();
+        }
+        
+        function saveTournamentProgress() {
+            enhancedTournamentSystem.saveTournamentProgress();
+            alert('Tournament progress saved!');
+            audioSystem?.play('menuClick');
+        }
+        
+        function customizeTournament() {
+            showPanel('tournamentCustomize');
+            updateTournamentPreview();
+        }
+        
+        function updateTournamentPreview() {
+            const size = parseInt(document.getElementById('tournamentSize').value);
+            const format = document.getElementById('bracketFormat').value;
+            const difficulty = document.getElementById('difficultyProgression').value;
+            const aiMode = document.getElementById('aiPersonalityMode').value;
+            const matchLength = parseInt(document.getElementById('matchLength').value);
+            
+            const totalRounds = Math.ceil(Math.log2(size));
+            const previewContent = document.getElementById('previewContent');
+            
+            let html = `
+                <div class="preview-round">
+                    <strong>Tournament Structure:</strong>
+                    <span>${size} opponents, ${totalRounds} rounds</span>
+                </div>
+                <div class="preview-round">
+                    <strong>Format:</strong>
+                    <span>${format.charAt(0).toUpperCase() + format.slice(1)} Elimination</span>
+                </div>
+                <div class="preview-round">
+                    <strong>Match Length:</strong>
+                    <span>Best of ${matchLength}</span>
+                </div>
+            `;
+            
+            // Show AI progression preview
+            if (aiMode === 'progressive') {
+                const personalities = [
+                    ['Balanced', 'Defensive'],
+                    ['Aggressive', 'Unpredictable'],
+                    ['Trickster', 'Copycat'],
+                    ['Perfect', 'Adaptive']
+                ];
+                
+                for (let i = 0; i < Math.min(totalRounds, 4); i++) {
+                    const roundPersonalities = personalities[i] || ['Expert AI'];
+                    html += `
+                        <div class="preview-round">
+                            <span>Round ${i + 1}:</span>
+                            <span>${roundPersonalities.join(', ')}</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            previewContent.innerHTML = html;
+        }
+        
+        function createCustomTournament() {
+            const settings = {
+                size: parseInt(document.getElementById('tournamentSize').value),
+                format: document.getElementById('bracketFormat').value,
+                difficultyProgression: document.getElementById('difficultyProgression').value,
+                aiPersonalityMode: document.getElementById('aiPersonalityMode').value,
+                matchLength: parseInt(document.getElementById('matchLength').value)
+            };
+            
+            enhancedTournamentSystem.createTournament(settings);
+            showTournamentBracket();
+            audioSystem?.play('gameStart');
+        }
+        
+        function resetTournamentSettings() {
+            document.getElementById('tournamentSize').value = '8';
+            document.getElementById('bracketFormat').value = 'single';
+            document.getElementById('difficultyProgression').value = 'adaptive';
+            document.getElementById('aiPersonalityMode').value = 'progressive';
+            document.getElementById('matchLength').value = '7';
+            updateTournamentPreview();
+            audioSystem?.play('menuClick');
+        }
+        
+        function viewMatchDetails(matchId) {
+            // Future enhancement: Show detailed match statistics
+            console.log('View match details for:', matchId);
         }
         
         function exportAnalyticsAsCSV(data) {
