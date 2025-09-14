@@ -21,7 +21,8 @@
     <title>Enhanced Pong Game - Ultimate Edition</title>
     
     <!-- Chart.js for Analytics Dashboard -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
     <script src="version-manager.js"></script>
 </head>
     <style>
@@ -880,6 +881,152 @@
             content: '🎤 ';
         }
         
+        /* Online Multiplayer Styles */
+        .connection-status-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .status-item {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .connection-status {
+            font-weight: 600;
+        }
+        
+        .connection-status.ready, .connection-status.connected {
+            color: #4ecdc4;
+        }
+        
+        .connection-status.hosting {
+            color: #f9ca24;
+        }
+        
+        .connection-status.connecting {
+            color: #f0932b;
+        }
+        
+        .connection-status.disconnected {
+            color: #eb4d4b;
+        }
+        
+        .multiplayer-options {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .option-group {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .option-group h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .player-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .player-card {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 120px;
+        }
+        
+        .player-card h5 {
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+        
+        .vs-indicator {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .player-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .multiplayer-help {
+            margin: 20px 0;
+        }
+        
+        .multiplayer-help details {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .multiplayer-help summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+        
+        .help-content {
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .help-content ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .help-content li {
+            margin-bottom: 8px;
+        }
+        
+        /* Mobile responsive for multiplayer */
+        @media (max-width: 768px) {
+            .connection-status-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .player-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .vs-indicator {
+                transform: rotate(90deg);
+            }
+        }
+        
         /* Navigation breadcrumbs */
         .nav-breadcrumb {
             position: absolute;
@@ -975,7 +1122,8 @@
                     <button class="menu-btn" onclick="startGame('tournament')">🏆 Tournament</button>
                     <button class="menu-btn" onclick="showPanel('tournamentBracket')">🏆 Tournament Bracket</button>
                     <button class="menu-btn" onclick="startGame('practice')">🎯 Practice</button>
-                    <button class="menu-btn" onclick="startGame('multiplayer')">👥 Multiplayer</button>
+                    <button class="menu-btn" onclick="startGame('multiplayer')">👥 Local Multiplayer</button>
+                    <button class="menu-btn" onclick="showPanel('onlineMultiplayer')">🌐 Online Multiplayer</button>
                 </div>
                 
                 <div class="form-group">
@@ -1341,6 +1489,110 @@
                     <button class="menu-btn secondary" onclick="exportAnalyticsData()">💾 Export Data</button>
                     <button class="menu-btn secondary" onclick="refreshAnalyticsCharts()">🔄 Refresh Charts</button>
                     <button class="menu-btn secondary" onclick="showPanel('stats')">🔙 Back to Stats</button>
+                </div>
+            </div>
+            
+            <!-- Online Multiplayer Panel -->
+            <div id="onlineMultiplayerPanel" class="menu-panel" style="display: none;">
+                <div class="nav-breadcrumb">
+                    <span>🏓 Main Menu</span>
+                    <span class="separator">></span>
+                    <span>🌐 Online Multiplayer</span>
+                </div>
+                <div class="menu-header">
+                    <h1 class="menu-title">🌐 Online Multiplayer</h1>
+                    <p class="menu-subtitle">Play against other players online</p>
+                </div>
+                
+                <div class="connection-status-bar">
+                    <div class="status-item">
+                        <span>Status: <span id="multiplayerStatus">❌ Disconnected</span></span>
+                    </div>
+                    <div class="status-item">
+                        <span>Ping: <span id="latencyDisplay">--ms</span></span>
+                    </div>
+                    <div class="status-item">
+                        <span>Player: <span id="playerDisplayName">Guest</span></span>
+                    </div>
+                </div>
+                
+                <div class="multiplayer-options">
+                    <div class="option-group">
+                        <h4>🏠 Host a Game</h4>
+                        <div class="form-group">
+                            <input type="text" id="roomIdInput" placeholder="Enter custom room ID (optional)" maxlength="8">
+                            <button class="menu-btn" onclick="createOnlineRoom()" id="createRoomBtn">🏠 Create Room</button>
+                        </div>
+                        <div id="roomInfo" style="display: none;">
+                            <p>Room ID: <strong id="displayRoomId"></strong></p>
+                            <p>Share this ID with your friend to join!</p>
+                            <button class="menu-btn secondary" onclick="copyRoomId()"📋 Copy Room ID</button>
+                        </div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <h4>🚪 Join a Game</h4>
+                        <div class="form-group">
+                            <input type="text" id="joinRoomInput" placeholder="Enter room ID" maxlength="8">
+                            <button class="menu-btn" onclick="joinOnlineRoom()" id="joinRoomBtn">🚪 Join Room</button>
+                        </div>
+                    </div>
+                    
+                    <div class="option-group" id="gameReadySection" style="display: none;">
+                        <h4>✅ Ready to Play</h4>
+                        <div class="player-info">
+                            <div class="player-card">
+                                <h5>You</h5>
+                                <span id="yourPlayerName">Player 1</span>
+                            </div>
+                            <div class="vs-indicator">VS</div>
+                            <div class="player-card">
+                                <h5>Opponent</h5>
+                                <span id="opponentPlayerName">Waiting...</span>
+                            </div>
+                        </div>
+                        <button class="menu-btn" onclick="startOnlineMatch()" id="startMatchBtn">🎮 Start Match</button>
+                    </div>
+                    
+                    <div class="option-group">
+                        <h4>👤 Player Profile</h4>
+                        <div class="form-group">
+                            <label>Display Name:</label>
+                            <input type="text" id="displayNameInput" placeholder="Enter your name" maxlength="20">
+                            <button class="menu-btn secondary" onclick="updatePlayerProfile()">💾 Save</button>
+                        </div>
+                        <div class="player-stats">
+                            <div class="stat-item">
+                                <span>Games Played: <span id="onlineGamesPlayed">0</span></span>
+                            </div>
+                            <div class="stat-item">
+                                <span>Games Won: <span id="onlineGamesWon">0</span></span>
+                            </div>
+                            <div class="stat-item">
+                                <span>Rating: <span id="playerRating">1200</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="multiplayer-help">
+                    <details>
+                        <summary>❓ How to Play Online</summary>
+                        <div class="help-content">
+                            <ol>
+                                <li><strong>Host:</strong> Create a room and share the Room ID with your friend</li>
+                                <li><strong>Join:</strong> Enter your friend's Room ID and click Join</li>
+                                <li><strong>Play:</strong> Once connected, the host can start the match</li>
+                                <li><strong>Controls:</strong> Same as local multiplayer - mouse/touch controls</li>
+                            </ol>
+                            <p><strong>Note:</strong> Both players need a stable internet connection for the best experience.</p>
+                        </div>
+                    </details>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+                    <button class="menu-btn secondary" onclick="disconnectMultiplayer()" id="disconnectBtn">❌ Disconnect</button>
+                    <button class="menu-btn secondary" onclick="showPanel('menu')">🔙 Back to Menu</button>
                 </div>
             </div>
             
@@ -4583,6 +4835,10 @@
                 case 'tournamentCustomize':
                     targetElement = document.getElementById('tournamentCustomizePanel');
                     setTimeout(() => updateTournamentPreview(), 50);
+                    break;
+                case 'onlineMultiplayer':
+                    targetElement = document.getElementById('onlineMultiplayerPanel');
+                    setTimeout(() => initializeMultiplayerUI(), 50);
                     break;
             }
             
@@ -7910,6 +8166,1054 @@
             setTimeout(() => message.remove(), 3000);
         }
         
+        // ===== ONLINE MULTIPLAYER SYSTEM =====
+        
+        class OnlineMultiplayerSystem {
+            constructor() {
+                this.isHost = false;
+                this.isGuest = false;
+                this.connection = null;
+                this.peer = null;
+                this.gameRoom = null;
+                this.connectionStatus = 'disconnected';
+                this.latency = 0;
+                this.lastPingTime = 0;
+                this.gameStateSync = {
+                    lastSyncTime: 0,
+                    syncInterval: 16, // ~60fps sync
+                    desyncThreshold: 100 // ms
+                };
+                this.playerProfile = this.loadPlayerProfile();
+                
+                this.initializePeerJS();
+            }
+            
+            initializePeerJS() {
+                // Use a free PeerJS server for WebRTC signaling
+                try {
+                    this.peer = new Peer({
+                        host: 'peerjs-server.herokuapp.com',
+                        port: 443,
+                        secure: true,
+                        config: {
+                            iceServers: [
+                                { urls: 'stun:stun.l.google.com:19302' },
+                                { urls: 'stun:stun1.l.google.com:19302' }
+                            ]
+                        }
+                    });
+                    
+                    this.setupPeerEvents();
+                } catch (error) {
+                    console.warn('PeerJS not available, multiplayer disabled:', error);
+                    this.showMultiplayerError('WebRTC not supported in this environment');
+                }
+            }
+            
+            setupPeerEvents() {
+                this.peer.on('open', (id) => {
+                    console.log('Peer connection opened with ID:', id);
+                    this.playerId = id;
+                    this.connectionStatus = 'ready';
+                    this.updateConnectionUI();
+                });
+                
+                this.peer.on('connection', (conn) => {
+                    console.log('Incoming connection from:', conn.peer);
+                    this.handleIncomingConnection(conn);
+                });
+                
+                this.peer.on('error', (error) => {
+                    console.error('Peer connection error:', error);
+                    this.handleConnectionError(error);
+                });
+            }
+            
+            createRoom(roomId) {
+                if (!this.peer) {
+                    this.showMultiplayerError('Multiplayer not initialized');
+                    return false;
+                }
+                
+                this.gameRoom = {
+                    id: roomId || this.generateRoomId(),
+                    host: this.playerId,
+                    guest: null,
+                    gameState: 'waiting',
+                    settings: {
+                        winScore: 7,
+                        ballSpeed: 5,
+                        gameMode: 'online'
+                    }
+                };
+                
+                this.isHost = true;
+                this.connectionStatus = 'hosting';
+                this.updateConnectionUI();
+                
+                return this.gameRoom.id;
+            }
+            
+            joinRoom(roomId) {
+                if (!this.peer || !roomId) {
+                    this.showMultiplayerError('Invalid room ID or multiplayer not ready');
+                    return false;
+                }
+                
+                try {
+                    this.connection = this.peer.connect(roomId, {
+                        reliable: true,
+                        metadata: {
+                            playerProfile: this.playerProfile,
+                            gameVersion: '1.6.0'
+                        }
+                    });
+                    
+                    this.setupConnectionEvents();
+                    this.isGuest = true;
+                    this.connectionStatus = 'connecting';
+                    this.updateConnectionUI();
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Failed to join room:', error);
+                    this.showMultiplayerError('Failed to connect to room');
+                    return false;
+                }
+            }
+            
+            handleIncomingConnection(conn) {
+                if (this.connection) {
+                    conn.close();
+                    return; // Already have a connection
+                }
+                
+                this.connection = conn;
+                this.setupConnectionEvents();
+                
+                if (this.gameRoom) {
+                    this.gameRoom.guest = conn.peer;
+                    this.gameRoom.gameState = 'connected';
+                }
+            }
+            
+            setupConnectionEvents() {
+                this.connection.on('open', () => {
+                    console.log('Data connection established');
+                    this.connectionStatus = 'connected';
+                    this.startPingMonitoring();
+                    this.updateConnectionUI();
+                    
+                    if (this.isHost) {
+                        this.sendGameState('room_joined', this.gameRoom);
+                    }
+                });
+                
+                this.connection.on('data', (data) => {
+                    this.handleGameMessage(data);
+                });
+                
+                this.connection.on('close', () => {
+                    console.log('Connection closed');
+                    this.handleDisconnection();
+                });
+                
+                this.connection.on('error', (error) => {
+                    console.error('Connection error:', error);
+                    this.handleConnectionError(error);
+                });
+            }
+            
+            sendGameMessage(type, data) {
+                if (!this.connection || this.connection.open !== true) {
+                    return false;
+                }
+                
+                try {
+                    const message = {
+                        type: type,
+                        data: data,
+                        timestamp: Date.now(),
+                        playerId: this.playerId
+                    };
+                    
+                    this.connection.send(message);
+                    return true;
+                } catch (error) {
+                    console.error('Failed to send message:', error);
+                    return false;
+                }
+            }
+            
+            handleGameMessage(message) {
+                const { type, data, timestamp, playerId } = message;
+                
+                switch (type) {
+                    case 'paddle_move':
+                        this.handleOpponentPaddleMove(data);
+                        break;
+                    case 'ball_sync':
+                        this.handleBallSync(data);
+                        break;
+                    case 'game_start':
+                        this.handleGameStart(data);
+                        break;
+                    case 'score_update':
+                        this.handleScoreUpdate(data);
+                        break;
+                    case 'game_pause':
+                        this.handleGamePause(data);
+                        break;
+                    case 'game_end':
+                        this.handleGameEnd(data);
+                        break;
+                    case 'ping':
+                        this.handlePing(timestamp);
+                        break;
+                    case 'pong':
+                        this.handlePong(timestamp);
+                        break;
+                    case 'room_joined':
+                        this.handleRoomJoined(data);
+                        break;
+                    case 'chat_message':
+                        this.handleChatMessage(data);
+                        break;
+                    default:
+                        console.warn('Unknown message type:', type);
+                }
+            }
+            
+            startMultiplayerGame() {
+                if (!this.connection || this.connectionStatus !== 'connected') {
+                    this.showMultiplayerError('No connection established');
+                    return false;
+                }
+                
+                if (this.isHost) {
+                    // Host starts the game
+                    gameEngine.setGameMode('online');
+                    gameEngine.gameState = 'playing';
+                    
+                    this.sendGameMessage('game_start', {
+                        hostSide: 'left',
+                        guestSide: 'right',
+                        settings: this.gameRoom.settings
+                    });
+                    
+                    this.startGameStateSync();
+                } else {
+                    // Guest waits for host to start
+                    this.showWaitingMessage('Waiting for host to start the game...');
+                }
+                
+                return true;
+            }
+            
+            startGameStateSync() {
+                this.gameSyncInterval = setInterval(() => {
+                    if (gameEngine.gameState === 'playing' && this.isHost) {
+                        this.syncBallPosition();
+                    }
+                    this.syncPaddlePosition();
+                }, this.gameStateSync.syncInterval);
+            }
+            
+            syncPaddlePosition() {
+                const paddleData = {
+                    y: this.isHost ? gameEngine.player.y : gameEngine.ai.y,
+                    velocity: 0, // Could track velocity for prediction
+                    timestamp: Date.now()
+                };
+                
+                this.sendGameMessage('paddle_move', paddleData);
+            }
+            
+            syncBallPosition() {
+                if (!this.isHost) return;
+                
+                const ballData = {
+                    x: gameEngine.ball.x,
+                    y: gameEngine.ball.y,
+                    vx: gameEngine.ball.vx,
+                    vy: gameEngine.ball.vy,
+                    timestamp: Date.now()
+                };
+                
+                this.sendGameMessage('ball_sync', ballData);
+            }
+            
+            handleOpponentPaddleMove(data) {
+                const opponentPaddle = this.isHost ? gameEngine.ai : gameEngine.player;
+                const latencyCompensation = (Date.now() - data.timestamp) / 1000;
+                
+                // Apply position with latency compensation
+                opponentPaddle.y = data.y + (data.velocity * latencyCompensation);
+            }
+            
+            handleBallSync(data) {
+                if (this.isHost) return; // Only guest receives ball sync
+                
+                const latencyCompensation = (Date.now() - data.timestamp) / 1000;
+                
+                // Apply ball position with prediction
+                gameEngine.ball.x = data.x + (data.vx * latencyCompensation);
+                gameEngine.ball.y = data.y + (data.vy * latencyCompensation);
+                gameEngine.ball.vx = data.vx;
+                gameEngine.ball.vy = data.vy;
+            }
+            
+            startPingMonitoring() {
+                this.pingInterval = setInterval(() => {
+                    this.lastPingTime = Date.now();
+                    this.sendGameMessage('ping', this.lastPingTime);
+                }, 1000); // Ping every second
+            }
+            
+            handlePing(timestamp) {
+                this.sendGameMessage('pong', timestamp);
+            }
+            
+            handlePong(originalTimestamp) {
+                this.latency = Date.now() - originalTimestamp;
+                this.updateLatencyDisplay();
+            }
+            
+            handleGameStart(data) {
+                console.log('Game started by host:', data);
+                
+                if (this.isGuest) {
+                    gameEngine.setGameMode('online');
+                    gameEngine.gameState = 'playing';
+                    
+                    // Set up sides (guest is always on the right)
+                    this.playerSide = data.guestSide;
+                    
+                    showPanel('game');
+                    document.getElementById('gameModeDisplay').textContent = 
+                        'ONLINE MULTIPLAYER vs ' + (this.connection.metadata?.playerProfile?.displayName || 'Opponent');
+                    
+                    this.startGameStateSync();
+                }
+            }
+            
+            handleScoreUpdate(data) {
+                console.log('Score update:', data);
+                
+                if (gameEngine) {
+                    // Update scores based on player side
+                    if (this.isHost) {
+                        gameEngine.player.score = data.hostScore;
+                        gameEngine.ai.score = data.guestScore;
+                    } else {
+                        gameEngine.player.score = data.guestScore;
+                        gameEngine.ai.score = data.hostScore;
+                    }
+                }
+            }
+            
+            handleGamePause(data) {
+                console.log('Game paused by opponent');
+                
+                if (gameEngine) {
+                    gameEngine.gameState = 'paused';
+                    this.showWaitingMessage('Game paused by opponent');
+                }
+            }
+            
+            handleGameEnd(data) {
+                console.log('Game ended:', data);
+                
+                if (gameEngine) {
+                    gameEngine.gameState = 'gameOver';
+                    
+                    // Update player profile stats
+                    this.updatePlayerStats(data.winner === this.playerId);
+                    
+                    // Show game results
+                    this.showGameResults(data);
+                }
+            }
+            
+            handleRoomJoined(data) {
+                console.log('Room joined successfully:', data);
+                
+                // Update UI to show ready state
+                const gameReadySection = document.getElementById('gameReadySection');
+                if (gameReadySection) {
+                    gameReadySection.style.display = 'block';
+                    
+                    document.getElementById('yourPlayerName').textContent = 
+                        this.playerProfile.displayName;
+                    document.getElementById('opponentPlayerName').textContent = 
+                        this.connection.metadata?.playerProfile?.displayName || 'Host';
+                }
+                
+                this.showWaitingMessage('Connected! Waiting for host to start the match...');
+            }
+            
+            handleChatMessage(data) {
+                console.log('Chat message:', data);
+                // Could implement in-game chat here
+            }
+            
+            handleDisconnection() {
+                console.log('Player disconnected');
+                this.connectionStatus = 'disconnected';
+                
+                // Pause game if playing
+                if (gameEngine && gameEngine.gameState === 'playing') {
+                    gameEngine.gameState = 'paused';
+                    this.showWaitingMessage('Opponent disconnected. Game paused.');
+                }
+                
+                this.updateConnectionUI();
+            }
+            
+            handleConnectionError(error) {
+                console.error('Connection error:', error);
+                this.connectionStatus = 'disconnected';
+                this.updateConnectionUI();
+                this.showMultiplayerError('Connection error: ' + error.message);
+            }
+            
+            updatePlayerStats(won) {
+                this.playerProfile.gamesPlayed++;
+                if (won) {
+                    this.playerProfile.gamesWon++;
+                    this.playerProfile.rating += 25; // Simple rating system
+                } else {
+                    this.playerProfile.rating = Math.max(800, this.playerProfile.rating - 15);
+                }
+                
+                this.savePlayerProfile();
+            }
+            
+            showGameResults(data) {
+                const winner = data.winner === this.playerId ? 'You' : 'Opponent';
+                const message = winner === 'You' ? 'Victory!' : 'Defeat!';
+                
+                setTimeout(() => {
+                    alert(message + ' Final Score: ' + data.finalScore.player + '-' + data.finalScore.opponent);
+                    showPanel('onlineMultiplayer');
+                }, 2000);
+            }
+            
+            disconnect() {
+                if (this.connection) {
+                    this.connection.close();
+                }
+                
+                if (this.gameSyncInterval) {
+                    clearInterval(this.gameSyncInterval);
+                }
+                
+                if (this.pingInterval) {
+                    clearInterval(this.pingInterval);
+                }
+                
+                this.connectionStatus = 'disconnected';
+                this.isHost = false;
+                this.isGuest = false;
+                this.gameRoom = null;
+                
+                this.updateConnectionUI();
+            }
+            
+            generateRoomId() {
+                return Math.random().toString(36).substr(2, 8).toUpperCase();
+            }
+            
+            loadPlayerProfile() {
+                const saved = localStorage.getItem('enhancedPongPlayerProfile');
+                return saved ? JSON.parse(saved) : {
+                    playerId: this.generatePlayerId(),
+                    displayName: 'Player' + Math.floor(Math.random() * 1000),
+                    gamesPlayed: 0,
+                    gamesWon: 0,
+                    rating: 1200,
+                    createdAt: new Date().toISOString()
+                };
+            }
+            
+            savePlayerProfile() {
+                localStorage.setItem('enhancedPongPlayerProfile', JSON.stringify(this.playerProfile));
+            }
+            
+            generatePlayerId() {
+                return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            }
+            
+            updateConnectionUI() {
+                // Update multiplayer UI based on connection status
+                const statusElement = document.getElementById('multiplayerStatus');
+                const latencyElement = document.getElementById('latencyDisplay');
+                
+                if (statusElement) {
+                    statusElement.textContent = this.getStatusText();
+                    statusElement.className = 'connection-status ' + this.connectionStatus;
+                }
+            }
+            
+            updateLatencyDisplay() {
+                const element = document.getElementById('latencyDisplay');
+                if (element) {
+                    const color = this.latency < 50 ? 'green' : this.latency < 100 ? 'yellow' : 'red';
+                    element.innerHTML = `<span style="color: ${color}">${this.latency}ms</span>`;
+                }
+            }
+            
+            getStatusText() {
+                const statusTexts = {
+                    disconnected: '❌ Disconnected',
+                    ready: '✅ Ready',
+                    hosting: '🏠 Hosting Room',
+                    connecting: '🔄 Connecting...',
+                    connected: '✅ Connected'
+                };
+                
+                return statusTexts[this.connectionStatus] || 'Unknown';
+            }
+            
+            showMultiplayerError(message) {
+                console.error('Multiplayer Error:', message);
+                // Show error to user - implementation depends on UI
+            }
+            
+            showWaitingMessage(message) {
+                console.log('Multiplayer:', message);
+                // Show waiting message to user
+            }
+        }
+        
+        // Initialize multiplayer system
+        let multiplayerSystem = null;
+        
+        // ===== GAME REPLAY SYSTEM =====
+        
+        class GameReplaySystem {
+            constructor() {
+                this.isRecording = false;
+                this.currentReplay = null;
+                this.replayData = {
+                    gameStates: [],
+                    metadata: null,
+                    events: []
+                };
+                this.recordingInterval = null;
+                this.frameRate = 30; // Record at 30 FPS
+                this.maxRecordingTime = 300000; // 5 minutes max
+                
+                this.loadSavedReplays();
+            }
+            
+            startRecording(gameMode, aiPersonality, playerName = 'Player') {
+                this.isRecording = true;
+                this.replayData = {
+                    gameStates: [],
+                    metadata: {
+                        id: this.generateReplayId(),
+                        gameMode: gameMode,
+                        aiPersonality: aiPersonality,
+                        playerName: playerName,
+                        startTime: new Date().toISOString(),
+                        endTime: null,
+                        duration: 0,
+                        finalScore: null,
+                        winner: null,
+                        version: '1.6.0'
+                    },
+                    events: []
+                };
+                
+                console.log('Started recording replay:', this.replayData.metadata.id);
+                
+                // Record initial state
+                this.recordGameState();
+                
+                // Start periodic recording
+                this.recordingInterval = setInterval(() => {
+                    this.recordGameState();
+                }, 1000 / this.frameRate);
+                
+                // Stop recording after max time
+                setTimeout(() => {
+                    if (this.isRecording) {
+                        this.stopRecording('timeout');
+                    }
+                }, this.maxRecordingTime);
+                
+                return this.replayData.metadata.id;
+            }
+            
+            recordGameState() {
+                if (!this.isRecording || !gameEngine) return;
+                
+                const gameState = {
+                    timestamp: Date.now(),
+                    frameIndex: this.replayData.gameStates.length,
+                    ball: {
+                        x: gameEngine.ball.x,
+                        y: gameEngine.ball.y,
+                        vx: gameEngine.ball.vx,
+                        vy: gameEngine.ball.vy,
+                        width: gameEngine.ball.width,
+                        height: gameEngine.ball.height
+                    },
+                    player: {
+                        y: gameEngine.player.y,
+                        score: gameEngine.player.score,
+                        height: gameEngine.player.height
+                    },
+                    ai: {
+                        y: gameEngine.ai.y,
+                        score: gameEngine.ai.score,
+                        height: gameEngine.ai.height,
+                        personality: gameEngine.ai.personality
+                    },
+                    gameState: gameEngine.gameState,
+                    currentRally: gameEngine.stats?.currentRally || 0,
+                    effects: {
+                        playerEffects: { ...gameEngine.playerEffects },
+                        aiEffects: { ...gameEngine.aiEffects },
+                        ballSizeEffect: gameEngine.ballSizeEffect,
+                        magneticEffect: gameEngine.magneticEffect
+                    },
+                    powerUps: gameEngine.powerUps ? gameEngine.powerUps.map(p => ({
+                        x: p.x,
+                        y: p.y,
+                        type: p.type,
+                        active: p.active
+                    })) : []
+                };
+                
+                this.replayData.gameStates.push(gameState);
+                
+                // Limit memory usage - keep only recent states if too many
+                if (this.replayData.gameStates.length > 18000) { // 10 minutes at 30fps
+                    this.replayData.gameStates.shift();
+                }
+            }
+            
+            recordEvent(eventType, eventData) {
+                if (!this.isRecording) return;
+                
+                const event = {
+                    timestamp: Date.now(),
+                    frameIndex: this.replayData.gameStates.length - 1,
+                    type: eventType,
+                    data: eventData
+                };
+                
+                this.replayData.events.push(event);
+                console.log('Recorded event:', eventType, eventData);
+            }
+            
+            stopRecording(reason = 'manual') {
+                if (!this.isRecording) return null;
+                
+                this.isRecording = false;
+                
+                if (this.recordingInterval) {
+                    clearInterval(this.recordingInterval);
+                    this.recordingInterval = null;
+                }
+                
+                // Finalize metadata
+                this.replayData.metadata.endTime = new Date().toISOString();
+                this.replayData.metadata.duration = Date.now() - new Date(this.replayData.metadata.startTime).getTime();
+                
+                if (gameEngine) {
+                    this.replayData.metadata.finalScore = {
+                        player: gameEngine.player.score,
+                        ai: gameEngine.ai.score
+                    };
+                    this.replayData.metadata.winner = 
+                        gameEngine.player.score > gameEngine.ai.score ? 'player' : 'ai';
+                }
+                
+                console.log('Stopped recording replay:', this.replayData.metadata.id, 'Reason:', reason);
+                
+                // Save replay to localStorage
+                this.saveReplay(this.replayData);
+                
+                const replayId = this.replayData.metadata.id;
+                this.replayData = { gameStates: [], metadata: null, events: [] };
+                
+                return replayId;
+            }
+            
+            saveReplay(replayData) {
+                try {
+                    const compressed = this.compressReplayData(replayData);
+                    const savedReplays = this.getSavedReplays();
+                    
+                    savedReplays[replayData.metadata.id] = {
+                        metadata: replayData.metadata,
+                        compressed: compressed,
+                        size: JSON.stringify(compressed).length
+                    };
+                    
+                    // Limit number of saved replays (keep most recent 20)
+                    const replayIds = Object.keys(savedReplays);
+                    if (replayIds.length > 20) {
+                        const sortedIds = replayIds.sort((a, b) => 
+                            new Date(savedReplays[b].metadata.startTime) - new Date(savedReplays[a].metadata.startTime)
+                        );
+                        
+                        // Remove oldest replays
+                        sortedIds.slice(20).forEach(id => {
+                            delete savedReplays[id];
+                        });
+                    }
+                    
+                    localStorage.setItem('enhancedPongReplays', JSON.stringify(savedReplays));
+                    console.log('Saved replay:', replayData.metadata.id);
+                } catch (error) {
+                    console.error('Failed to save replay:', error);
+                }
+            }
+            
+            compressReplayData(replayData) {
+                // Simple compression by removing duplicate states and using deltas
+                const compressed = {
+                    metadata: replayData.metadata,
+                    events: replayData.events,
+                    gameStates: []
+                };
+                
+                let lastState = null;
+                replayData.gameStates.forEach((state, index) => {
+                    if (index === 0 || index % 5 === 0) { // Keep every 5th frame
+                        compressed.gameStates.push(state);
+                        lastState = state;
+                    }
+                });
+                
+                return compressed;
+            }
+            
+            getSavedReplays() {
+                try {
+                    const saved = localStorage.getItem('enhancedPongReplays');
+                    return saved ? JSON.parse(saved) : {};
+                } catch (error) {
+                    console.error('Error loading saved replays:', error);
+                    return {};
+                }
+            }
+            
+            loadSavedReplays() {
+                this.savedReplays = this.getSavedReplays();
+                console.log('Loaded', Object.keys(this.savedReplays).length, 'saved replays');
+            }
+            
+            getReplaysList() {
+                const replays = this.getSavedReplays();
+                return Object.values(replays)
+                    .map(replay => replay.metadata)
+                    .sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            }
+            
+            loadReplay(replayId) {
+                const savedReplays = this.getSavedReplays();
+                const replayData = savedReplays[replayId];
+                
+                if (!replayData) {
+                    console.error('Replay not found:', replayId);
+                    return null;
+                }
+                
+                return this.decompressReplayData(replayData.compressed);
+            }
+            
+            decompressReplayData(compressed) {
+                // Decompress by interpolating between keyframes
+                const decompressed = {
+                    metadata: compressed.metadata,
+                    events: compressed.events,
+                    gameStates: []
+                };
+                
+                // For now, just return the compressed states
+                // Could implement interpolation between keyframes here
+                decompressed.gameStates = compressed.gameStates;
+                
+                return decompressed;
+            }
+            
+            deleteReplay(replayId) {
+                const savedReplays = this.getSavedReplays();
+                if (savedReplays[replayId]) {
+                    delete savedReplays[replayId];
+                    localStorage.setItem('enhancedPongReplays', JSON.stringify(savedReplays));
+                    console.log('Deleted replay:', replayId);
+                    return true;
+                }
+                return false;
+            }
+            
+            exportReplay(replayId) {
+                const replayData = this.loadReplay(replayId);
+                if (!replayData) return null;
+                
+                const exportData = {
+                    ...replayData,
+                    exportedAt: new Date().toISOString(),
+                    exportVersion: '1.0'
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], 
+                    { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `enhanced-pong-replay-${replayId}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+                return true;
+            }
+            
+            generateReplayId() {
+                return 'replay_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            }
+            
+            // Integration with game engine
+            initializeGameIntegration() {
+                // Hook into game events to record them
+                this.hookGameEvents();
+            }
+            
+            hookGameEvents() {
+                // Override game engine methods to record events
+                if (!gameEngine) return;
+                
+                const originalWinGame = gameEngine.winGame;
+                gameEngine.winGame = () => {
+                    this.recordEvent('game_win', {
+                        playerScore: gameEngine.player.score,
+                        aiScore: gameEngine.ai.score
+                    });
+                    originalWinGame.call(gameEngine);
+                    this.stopRecording('game_end');
+                };
+                
+                const originalLoseGame = gameEngine.loseGame;
+                gameEngine.loseGame = () => {
+                    this.recordEvent('game_lose', {
+                        playerScore: gameEngine.player.score,
+                        aiScore: gameEngine.ai.score
+                    });
+                    originalLoseGame.call(gameEngine);
+                    this.stopRecording('game_end');
+                };
+            }
+        }
+        
+        // Initialize replay system
+        let replaySystem = null;
+        
+        // ===== MULTIPLAYER UI FUNCTIONS =====
+        
+        function initializeMultiplayerUI() {
+            if (!multiplayerSystem) {
+                console.warn('Multiplayer system not initialized');
+                return;
+            }
+            
+            // Update player profile display
+            updatePlayerProfileUI();
+            
+            // Update connection status
+            multiplayerSystem.updateConnectionUI();
+            
+            // Setup event listeners for room ID inputs
+            setupRoomInputValidation();
+        }
+        
+        function updatePlayerProfileUI() {
+            if (!multiplayerSystem || !multiplayerSystem.playerProfile) return;
+            
+            const profile = multiplayerSystem.playerProfile;
+            
+            document.getElementById('playerDisplayName').textContent = profile.displayName;
+            document.getElementById('displayNameInput').value = profile.displayName;
+            document.getElementById('onlineGamesPlayed').textContent = profile.gamesPlayed;
+            document.getElementById('onlineGamesWon').textContent = profile.gamesWon;
+            document.getElementById('playerRating').textContent = profile.rating;
+        }
+        
+        function setupRoomInputValidation() {
+            const roomIdInput = document.getElementById('roomIdInput');
+            const joinRoomInput = document.getElementById('joinRoomInput');
+            
+            if (roomIdInput) {
+                roomIdInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                });
+            }
+            
+            if (joinRoomInput) {
+                joinRoomInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                });
+            }
+        }
+        
+        function createOnlineRoom() {
+            if (!multiplayerSystem) {
+                showError('Multiplayer system not initialized');
+                return;
+            }
+            
+            const customRoomId = document.getElementById('roomIdInput').value.trim();
+            const roomId = multiplayerSystem.createRoom(customRoomId);
+            
+            if (roomId) {
+                document.getElementById('displayRoomId').textContent = roomId;
+                document.getElementById('roomInfo').style.display = 'block';
+                document.getElementById('createRoomBtn').disabled = true;
+                
+                // Show success message
+                showSuccess('Room created successfully! Share the Room ID with your friend.');
+                audioSystem?.play('menuClick');
+            } else {
+                showError('Failed to create room. Please try again.');
+            }
+        }
+        
+        function joinOnlineRoom() {
+            if (!multiplayerSystem) {
+                showError('Multiplayer system not initialized');
+                return;
+            }
+            
+            const roomId = document.getElementById('joinRoomInput').value.trim();
+            
+            if (!roomId) {
+                showError('Please enter a room ID');
+                return;
+            }
+            
+            if (roomId.length < 4) {
+                showError('Room ID must be at least 4 characters');
+                return;
+            }
+            
+            const success = multiplayerSystem.joinRoom(roomId);
+            
+            if (success) {
+                document.getElementById('joinRoomBtn').disabled = true;
+                document.getElementById('joinRoomInput').disabled = true;
+                
+                showSuccess('Connecting to room...');
+                audioSystem?.play('menuClick');
+            } else {
+                showError('Failed to join room. Please check the Room ID.');
+            }
+        }
+        
+        function startOnlineMatch() {
+            if (!multiplayerSystem) {
+                showError('Multiplayer system not initialized');
+                return;
+            }
+            
+            const success = multiplayerSystem.startMultiplayerGame();
+            
+            if (success) {
+                audioSystem?.play('gameStart');
+            } else {
+                showError('Failed to start match. Please ensure both players are connected.');
+            }
+        }
+        
+        function updatePlayerProfile() {
+            const newDisplayName = document.getElementById('displayNameInput').value.trim();
+            
+            if (!newDisplayName) {
+                showError('Please enter a display name');
+                return;
+            }
+            
+            if (newDisplayName.length > 20) {
+                showError('Display name must be 20 characters or less');
+                return;
+            }
+            
+            if (multiplayerSystem && multiplayerSystem.playerProfile) {
+                multiplayerSystem.playerProfile.displayName = newDisplayName;
+                multiplayerSystem.savePlayerProfile();
+                
+                document.getElementById('playerDisplayName').textContent = newDisplayName;
+                showSuccess('Profile updated successfully!');
+                audioSystem?.play('menuClick');
+            }
+        }
+        
+        function copyRoomId() {
+            const roomId = document.getElementById('displayRoomId').textContent;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(roomId).then(() => {
+                    showSuccess('Room ID copied to clipboard!');
+                    audioSystem?.play('menuClick');
+                }).catch(() => {
+                    fallbackCopyToClipboard(roomId);
+                });
+            } else {
+                fallbackCopyToClipboard(roomId);
+            }
+        }
+        
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showSuccess('Room ID copied to clipboard!');
+                audioSystem?.play('menuClick');
+            } catch (err) {
+                showError('Failed to copy Room ID. Please copy manually: ' + text);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        function disconnectMultiplayer() {
+            if (multiplayerSystem) {
+                multiplayerSystem.disconnect();
+                
+                // Reset UI
+                document.getElementById('roomInfo').style.display = 'none';
+                document.getElementById('gameReadySection').style.display = 'none';
+                document.getElementById('createRoomBtn').disabled = false;
+                document.getElementById('joinRoomBtn').disabled = false;
+                document.getElementById('joinRoomInput').disabled = false;
+                document.getElementById('roomIdInput').value = '';
+                document.getElementById('joinRoomInput').value = '';
+                
+                showSuccess('Disconnected from multiplayer');
+                audioSystem?.play('menuClick');
+            }
+        }
+        
+        function showSuccess(message) {
+            console.log('Success:', message);
+            // Could implement toast notifications here
+        }
+        
+        function showError(message) {
+            console.error('Error:', message);
+            // Could implement toast notifications here
+        }
+        
         // ===== MAIN INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize all systems when DOM is ready
@@ -7922,6 +9226,9 @@
             // Initialize PWA and offline support
             initializePWA();
             initializeOfflineSupport();
+            
+            // Initialize multiplayer system
+            multiplayerSystem = new OnlineMultiplayerSystem();
             
             console.log('Enhanced Pong: All systems initialized');
         });
