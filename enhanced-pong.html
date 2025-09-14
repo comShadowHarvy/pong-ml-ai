@@ -23,6 +23,8 @@
     <!-- Chart.js for Analytics Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+    <!-- Socket.io Client for Real-time Multiplayer -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="version-manager.js"></script>
 </head>
     <style>
@@ -3447,7 +3449,17 @@
                             targetY = this.player.y + diff * 0.2; // Slow movement when frozen
                         }
                         
-                        this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, targetY));
+                        const newY = Math.max(0, Math.min(this.canvas.height - this.player.height, targetY));
+                        this.player.y = newY;
+                        
+                        // Send input to server for online multiplayer
+                        if (this.gameMode === 'online' && socketManager && socketManager.isConnected) {
+                            socketManager.sendPlayerInput({
+                                type: 'paddle_move',
+                                y: newY,
+                                timestamp: Date.now()
+                            });
+                        }
                     }
                 });
                 
@@ -3456,8 +3468,18 @@
                     if (this.gameState === 'playing') {
                         const rect = this.canvas.getBoundingClientRect();
                         const touchY = e.touches[0].clientY - rect.top;
-                        this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, 
+                        const newY = Math.max(0, Math.min(this.canvas.height - this.player.height, 
                             touchY - this.player.height / 2));
+                        this.player.y = newY;
+                        
+                        // Send input to server for online multiplayer
+                        if (this.gameMode === 'online' && socketManager && socketManager.isConnected) {
+                            socketManager.sendPlayerInput({
+                                type: 'paddle_move',
+                                y: newY,
+                                timestamp: Date.now()
+                            });
+                        }
                     }
                 }, { passive: false });
                 
@@ -4570,8 +4592,374 @@
             }
         }
 
+        // ===== SOCKET MANAGER =====
+        class SocketManager {
+            constructor() {
+                this.socket = null;
+                this.isConnected = false;
+                this.user = null;
+                this.currentRoom = null;
+                this.latency = 0;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 5;
+                this.eventHandlers = new Map();
+                this.serverUrl = 'http://localhost:3001'; // Backend server URL
+                
+                // Heartbeat for latency calculation
+                this.lastPingTime = 0;
+                this.pingInterval = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.connect();
+            }
+            
+            connect() {
+                try {
+                    // Initialize Socket.io connection
+                    this.socket = io(this.serverUrl, {
+                        autoConnect: true,
+                        timeout: 5000,
+                        transports: ['websocket', 'polling']
+                    });
+                    
+                    this.setupEventListeners();
+                    console.log('🔌 Attempting to connect to multiplayer server...');
+                } catch (error) {
+                    console.error('❌ Failed to initialize socket connection:', error);
+                    this.updateConnectionStatus('error');
+                }
+            }
+            
+            setupEventListeners() {
+                // Connection events
+                this.socket.on('connect', () => {
+                    console.log('✅ Connected to multiplayer server');
+                    this.isConnected = true;
+                    this.reconnectAttempts = 0;
+                    this.updateConnectionStatus('connected');
+                    this.startPingPong();
+                });
+                
+                this.socket.on('disconnect', (reason) => {
+                    console.log('❌ Disconnected from server:', reason);
+                    this.isConnected = false;
+                    this.updateConnectionStatus('disconnected');
+                    this.stopPingPong();
+                    
+                    // Attempt to reconnect if not intentional
+                    if (reason === 'io server disconnect') {
+                        this.attemptReconnect();
+                    }
+                });
+                
+                this.socket.on('connect_error', (error) => {
+                    console.error('❌ Connection error:', error);
+                    this.updateConnectionStatus('error');
+                    this.attemptReconnect();
+                });
+                
+                // Latency monitoring
+                this.socket.on('pong', () => {
+                    this.latency = Date.now() - this.lastPingTime;
+                    this.updateLatencyDisplay();
+                });
+                
+                // Authentication responses
+                this.socket.on('auth:success', (userData) => {
+                    console.log('🔐 Authentication successful:', userData.user.username);
+                    this.user = userData.user;
+                    this.updateUserDisplay();
+                    this.emit('userAuthenticated', userData.user);
+                });
+                
+                this.socket.on('auth:error', (error) => {
+                    console.error('❌ Authentication failed:', error);
+                    this.emit('authError', error);
+                });
+                
+                // Matchmaking events
+                this.socket.on('matchmaking:found', (matchData) => {
+                    console.log('🎮 Match found:', matchData);
+                    this.emit('matchFound', matchData);
+                });
+                
+                this.socket.on('matchmaking:cancelled', () => {
+                    console.log('⏹️ Matchmaking cancelled');
+                    this.emit('matchmakingCancelled');
+                });
+                
+                // Game events
+                this.socket.on('game:start', (gameData) => {
+                    console.log('🚀 Game starting:', gameData);
+                    this.emit('gameStart', gameData);
+                });
+                
+                this.socket.on('game:update', (gameState) => {
+                    this.emit('gameUpdate', gameState);
+                });
+                
+                this.socket.on('game:end', (result) => {
+                    console.log('🏁 Game ended:', result);
+                    this.emit('gameEnd', result);
+                });
+                
+                // Chat events
+                this.socket.on('chat:message', (messageData) => {
+                    this.emit('chatMessage', messageData);
+                });
+                
+                // Friend system events
+                this.socket.on('friend:request', (friendData) => {
+                    this.emit('friendRequest', friendData);
+                });
+                
+                this.socket.on('friend:accepted', (friendData) => {
+                    this.emit('friendAccepted', friendData);
+                });
+                
+                // Error handling
+                this.socket.on('error', (error) => {
+                    console.error('🔴 Socket error:', error);
+                    this.emit('socketError', error);
+                });
+            }
+            
+            // Event system for internal communication
+            on(event, handler) {
+                if (!this.eventHandlers.has(event)) {
+                    this.eventHandlers.set(event, []);
+                }
+                this.eventHandlers.get(event).push(handler);
+            }
+            
+            emit(event, data) {
+                if (this.eventHandlers.has(event)) {
+                    this.eventHandlers.get(event).forEach(handler => {
+                        try {
+                            handler(data);
+                        } catch (error) {
+                            console.error(`Error in event handler for ${event}:`, error);
+                        }
+                    });
+                }
+            }
+            
+            // Authentication methods
+            async authenticate(token) {
+                if (!this.isConnected) {
+                    throw new Error('Not connected to server');
+                }
+                
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Authentication timeout'));
+                    }, 5000);
+                    
+                    this.socket.emit('auth:token', { token });
+                    
+                    this.socket.once('auth:success', (userData) => {
+                        clearTimeout(timeout);
+                        resolve(userData);
+                    });
+                    
+                    this.socket.once('auth:error', (error) => {
+                        clearTimeout(timeout);
+                        reject(error);
+                    });
+                });
+            }
+            
+            async register(userData) {
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Registration timeout'));
+                    }, 10000);
+                    
+                    this.socket.emit('auth:register', userData);
+                    
+                    this.socket.once('auth:success', (result) => {
+                        clearTimeout(timeout);
+                        resolve(result);
+                    });
+                    
+                    this.socket.once('auth:error', (error) => {
+                        clearTimeout(timeout);
+                        reject(error);
+                    });
+                });
+            }
+            
+            async login(credentials) {
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Login timeout'));
+                    }, 10000);
+                    
+                    this.socket.emit('auth:login', credentials);
+                    
+                    this.socket.once('auth:success', (result) => {
+                        clearTimeout(timeout);
+                        resolve(result);
+                    });
+                    
+                    this.socket.once('auth:error', (error) => {
+                        clearTimeout(timeout);
+                        reject(error);
+                    });
+                });
+            }
+            
+            // Matchmaking methods
+            startMatchmaking(preferences = {}) {
+                if (!this.isConnected || !this.user) {
+                    throw new Error('Must be connected and authenticated');
+                }
+                
+                this.socket.emit('matchmaking:join', preferences);
+            }
+            
+            cancelMatchmaking() {
+                this.socket.emit('matchmaking:leave');
+            }
+            
+            // Game methods
+            sendPlayerInput(inputData) {
+                if (this.currentRoom) {
+                    this.socket.emit('game:input', {
+                        roomId: this.currentRoom,
+                        input: inputData
+                    });
+                }
+            }
+            
+            // Chat methods
+            sendChatMessage(message, type = 'lobby') {
+                this.socket.emit('chat:send', {
+                    message: message,
+                    type: type,
+                    roomId: this.currentRoom
+                });
+            }
+            
+            // Friend system methods
+            sendFriendRequest(username) {
+                this.socket.emit('friend:request', { username });
+            }
+            
+            acceptFriendRequest(friendId) {
+                this.socket.emit('friend:accept', { friendId });
+            }
+            
+            // Utility methods
+            startPingPong() {
+                this.pingInterval = setInterval(() => {
+                    if (this.isConnected) {
+                        this.lastPingTime = Date.now();
+                        this.socket.emit('ping');
+                    }
+                }, 1000);
+            }
+            
+            stopPingPong() {
+                if (this.pingInterval) {
+                    clearInterval(this.pingInterval);
+                    this.pingInterval = null;
+                }
+            }
+            
+            attemptReconnect() {
+                if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+                    console.error('❌ Max reconnection attempts reached');
+                    this.updateConnectionStatus('failed');
+                    return;
+                }
+                
+                this.reconnectAttempts++;
+                const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+                
+                console.log(`🔄 Reconnecting attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${delay}ms`);
+                
+                setTimeout(() => {
+                    this.socket.connect();
+                }, delay);
+            }
+            
+            updateConnectionStatus(status) {
+                const statusElement = document.getElementById('multiplayerStatus');
+                if (statusElement) {
+                    let statusText, statusEmoji;
+                    
+                    switch (status) {
+                        case 'connected':
+                            statusText = 'Connected';
+                            statusEmoji = '✅';
+                            break;
+                        case 'connecting':
+                            statusText = 'Connecting...';
+                            statusEmoji = '🔄';
+                            break;
+                        case 'disconnected':
+                            statusText = 'Disconnected';
+                            statusEmoji = '❌';
+                            break;
+                        case 'error':
+                            statusText = 'Connection Error';
+                            statusEmoji = '🔴';
+                            break;
+                        case 'failed':
+                            statusText = 'Connection Failed';
+                            statusEmoji = '💀';
+                            break;
+                        default:
+                            statusText = 'Unknown';
+                            statusEmoji = '❓';
+                    }
+                    
+                    statusElement.textContent = `${statusEmoji} ${statusText}`;
+                }
+            }
+            
+            updateLatencyDisplay() {
+                const latencyElement = document.getElementById('latencyDisplay');
+                if (latencyElement) {
+                    latencyElement.textContent = `${this.latency}ms`;
+                }
+            }
+            
+            updateUserDisplay() {
+                const playerNameElement = document.getElementById('playerDisplayName');
+                if (playerNameElement && this.user) {
+                    playerNameElement.textContent = this.user.username;
+                }
+            }
+            
+            disconnect() {
+                this.stopPingPong();
+                if (this.socket) {
+                    this.socket.disconnect();
+                }
+                this.isConnected = false;
+                this.user = null;
+                this.currentRoom = null;
+                this.updateConnectionStatus('disconnected');
+            }
+            
+            // Getters
+            getConnectionState() {
+                return {
+                    isConnected: this.isConnected,
+                    user: this.user,
+                    latency: this.latency,
+                    currentRoom: this.currentRoom
+                };
+            }
+        }
+
         // ===== GAME INITIALIZATION =====
-        let gameEngine, audioSystem, particleSystem, backgroundEffect, heatMapVisualizer;
+        let gameEngine, audioSystem, particleSystem, backgroundEffect, heatMapVisualizer, socketManager;
         let canvas, ctx, lastTime = 0;
         let currentPanel = 'menu';
         let gameSettings = {volume: 0.7, theme: 'neon', particles: true, screenShake: true, ballTrail: true, backgroundEffects: true, backgroundType: 'particles'};
@@ -4588,6 +4976,10 @@
             enhancedTournamentSystem = new EnhancedTournamentSystem();
             mobileControlSystem = new MobileControlSystem();
             accessibilitySystem = new AccessibilitySystem();
+            
+            // Initialize Socket.io for real-time multiplayer
+            socketManager = new SocketManager();
+            setupSocketEvents();
             
             // Initialize heat map visualizer after DOM is ready
             heatMapVisualizer.initialize('heatmapCanvas');
@@ -4635,6 +5027,194 @@
                 requestAnimationFrame(gameLoop);
             }
             requestAnimationFrame(gameLoop);
+        }
+        
+        // ===== SOCKET EVENT SETUP =====
+        function setupSocketEvents() {
+            if (!socketManager) return;
+            
+            // Authentication events
+            socketManager.on('userAuthenticated', (user) => {
+                console.log('User authenticated:', user);
+                updatePlayerProfileFromServer(user);
+            });
+            
+            socketManager.on('authError', (error) => {
+                console.error('Authentication error:', error);
+                showError('Authentication failed: ' + error.message);
+            });
+            
+            // Matchmaking events
+            socketManager.on('matchFound', (matchData) => {
+                console.log('Match found:', matchData);
+                handleMatchFound(matchData);
+            });
+            
+            socketManager.on('matchmakingCancelled', () => {
+                console.log('Matchmaking cancelled');
+                showMatchmakingUI(false);
+            });
+            
+            // Game events
+            socketManager.on('gameStart', (gameData) => {
+                console.log('Online game starting:', gameData);
+                socketManager.currentRoom = gameData.roomId;
+                startNetworkedGame(gameData);
+            });
+            
+            socketManager.on('gameUpdate', (gameState) => {
+                if (gameEngine.gameState === 'playing' && gameEngine.gameMode === 'online') {
+                    updateGameFromNetwork(gameState);
+                }
+            });
+            
+            socketManager.on('gameEnd', (result) => {
+                console.log('Online game ended:', result);
+                handleOnlineGameEnd(result);
+            });
+            
+            // Chat events
+            socketManager.on('chatMessage', (messageData) => {
+                displayChatMessage(messageData);
+            });
+            
+            // Friend system events
+            socketManager.on('friendRequest', (friendData) => {
+                showFriendRequestNotification(friendData);
+            });
+            
+            socketManager.on('friendAccepted', (friendData) => {
+                showFriendAcceptedNotification(friendData);
+            });
+            
+            // Socket error handling
+            socketManager.on('socketError', (error) => {
+                console.error('Socket error:', error);
+                showError('Connection error: ' + error.message);
+            });
+        }
+        
+        // ===== MULTIPLAYER EVENT HANDLERS =====
+        function updatePlayerProfileFromServer(user) {
+            document.getElementById('playerDisplayName').textContent = user.username;
+            document.getElementById('displayNameInput').value = user.username;
+            
+            // Update stats if available
+            if (user.stats) {
+                document.getElementById('onlineGamesPlayed').textContent = user.stats.gamesPlayed || 0;
+                document.getElementById('onlineGamesWon').textContent = user.stats.gamesWon || 0;
+                document.getElementById('playerRating').textContent = user.stats.rating || 1200;
+            }
+        }
+        
+        function handleMatchFound(matchData) {
+            // Show match found UI
+            showSuccess('Match found! Connecting to game...');
+            audioSystem?.play('gameStart');
+            
+            // Update opponent info
+            const opponentNameElement = document.getElementById('opponentPlayerName');
+            if (opponentNameElement && matchData.opponent) {
+                opponentNameElement.textContent = matchData.opponent.username;
+            }
+            
+            // Show ready section
+            const gameReadySection = document.getElementById('gameReadySection');
+            if (gameReadySection) {
+                gameReadySection.style.display = 'block';
+            }
+        }
+        
+        function startNetworkedGame(gameData) {
+            // Set up multiplayer game mode
+            gameEngine.gameMode = 'online';
+            gameEngine.gameState = 'playing';
+            
+            // Determine which side the player is on
+            const isPlayer1 = gameData.players[0].id === socketManager.user.id;
+            
+            // Hide multiplayer panel and show game
+            showPanel(null);
+            
+            // Initialize game state based on server data
+            if (gameData.initialState) {
+                gameEngine.ball = { ...gameEngine.ball, ...gameData.initialState.ball };
+                gameEngine.player = { ...gameEngine.player, ...gameData.initialState.player };
+                gameEngine.ai = { ...gameEngine.ai, ...gameData.initialState.opponent };
+            }
+            
+            // Reset scores
+            gameEngine.player.score = 0;
+            gameEngine.ai.score = 0;
+            
+            console.log('Started networked game as', isPlayer1 ? 'Player 1' : 'Player 2');
+        }
+        
+        function updateGameFromNetwork(gameState) {
+            // Update game state from server
+            if (gameState.ball) {
+                gameEngine.ball.x = gameState.ball.x;
+                gameEngine.ball.y = gameState.ball.y;
+                gameEngine.ball.vx = gameState.ball.vx;
+                gameEngine.ball.vy = gameState.ball.vy;
+            }
+            
+            if (gameState.players) {
+                // Update opponent paddle position (not our own)
+                const opponentData = gameState.players.find(p => p.id !== socketManager.user.id);
+                if (opponentData) {
+                    gameEngine.ai.y = opponentData.paddle.y;
+                    gameEngine.ai.score = opponentData.score;
+                }
+                
+                // Update our score
+                const playerData = gameState.players.find(p => p.id === socketManager.user.id);
+                if (playerData) {
+                    gameEngine.player.score = playerData.score;
+                }
+            }
+        }
+        
+        function handleOnlineGameEnd(result) {
+            gameEngine.gameState = 'menu';
+            gameEngine.gameMode = 'classic';
+            socketManager.currentRoom = null;
+            
+            // Show result
+            const won = result.winner === socketManager.user.id;
+            const message = won ? 'You Won! 🏆' : 'You Lost! 😢';
+            showSuccess(message + ' Final Score: ' + result.finalScore.player + ' - ' + result.finalScore.opponent);
+            
+            // Update stats
+            if (result.playerStats) {
+                updatePlayerProfileFromServer({ stats: result.playerStats });
+            }
+            
+            // Show menu
+            showPanel('menu');
+            audioSystem?.play(won ? 'win' : 'lose');
+        }
+        
+        function displayChatMessage(messageData) {
+            // TODO: Implement chat UI display
+            console.log('Chat message:', messageData);
+        }
+        
+        function showFriendRequestNotification(friendData) {
+            showSuccess(`Friend request from ${friendData.username}`);
+        }
+        
+        function showFriendAcceptedNotification(friendData) {
+            showSuccess(`${friendData.username} accepted your friend request!`);
+        }
+        
+        function showMatchmakingUI(show) {
+            // TODO: Implement matchmaking UI states
+            if (show) {
+                console.log('Showing matchmaking UI...');
+            } else {
+                console.log('Hiding matchmaking UI...');
+            }
         }
 
         function drawGame() {
@@ -9063,70 +9643,166 @@
         }
         
         function createOnlineRoom() {
-            if (!multiplayerSystem) {
-                showError('Multiplayer system not initialized');
+            if (!socketManager || !socketManager.isConnected) {
+                showError('Not connected to multiplayer server. Please check your connection.');
                 return;
             }
             
-            const customRoomId = document.getElementById('roomIdInput').value.trim();
-            const roomId = multiplayerSystem.createRoom(customRoomId);
+            if (!socketManager.user) {
+                showError('Please log in first to create a room.');
+                // Show login UI
+                showAuthenticationUI();
+                return;
+            }
             
-            if (roomId) {
-                document.getElementById('displayRoomId').textContent = roomId;
-                document.getElementById('roomInfo').style.display = 'block';
-                document.getElementById('createRoomBtn').disabled = true;
+            try {
+                // Start matchmaking to find another player
+                socketManager.startMatchmaking();
                 
-                // Show success message
-                showSuccess('Room created successfully! Share the Room ID with your friend.');
+                // Update UI to show matchmaking state
+                document.getElementById('createRoomBtn').disabled = true;
+                document.getElementById('createRoomBtn').textContent = 'Looking for opponent...';
+                
+                showSuccess('Looking for an opponent to play with...');
                 audioSystem?.play('menuClick');
-            } else {
-                showError('Failed to create room. Please try again.');
+                
+                // Auto-cancel after 30 seconds if no match found
+                setTimeout(() => {
+                    if (document.getElementById('createRoomBtn').disabled) {
+                        cancelMatchmaking();
+                    }
+                }, 30000);
+            } catch (error) {
+                console.error('Error starting matchmaking:', error);
+                showError('Failed to start matchmaking: ' + error.message);
             }
         }
         
         function joinOnlineRoom() {
-            if (!multiplayerSystem) {
-                showError('Multiplayer system not initialized');
+            if (!socketManager || !socketManager.isConnected) {
+                showError('Not connected to multiplayer server. Please check your connection.');
                 return;
             }
             
-            const roomId = document.getElementById('joinRoomInput').value.trim();
-            
-            if (!roomId) {
-                showError('Please enter a room ID');
+            if (!socketManager.user) {
+                showError('Please log in first to join a room.');
+                showAuthenticationUI();
                 return;
             }
             
-            if (roomId.length < 4) {
-                showError('Room ID must be at least 4 characters');
-                return;
-            }
-            
-            const success = multiplayerSystem.joinRoom(roomId);
-            
-            if (success) {
+            try {
+                // For now, treat 'join room' as starting matchmaking too
+                // In a future version, we could implement private rooms
+                socketManager.startMatchmaking();
+                
                 document.getElementById('joinRoomBtn').disabled = true;
+                document.getElementById('joinRoomBtn').textContent = 'Looking for game...';
                 document.getElementById('joinRoomInput').disabled = true;
                 
-                showSuccess('Connecting to room...');
+                showSuccess('Searching for available games...');
                 audioSystem?.play('menuClick');
-            } else {
-                showError('Failed to join room. Please check the Room ID.');
+                
+                // Auto-cancel after 30 seconds
+                setTimeout(() => {
+                    if (document.getElementById('joinRoomBtn').disabled) {
+                        cancelMatchmaking();
+                    }
+                }, 30000);
+            } catch (error) {
+                console.error('Error joining room:', error);
+                showError('Failed to search for games: ' + error.message);
             }
         }
         
         function startOnlineMatch() {
-            if (!multiplayerSystem) {
-                showError('Multiplayer system not initialized');
+            if (!socketManager || !socketManager.isConnected) {
+                showError('Not connected to multiplayer server.');
                 return;
             }
             
-            const success = multiplayerSystem.startMultiplayerGame();
+            if (!socketManager.currentRoom) {
+                showError('No active game room. Please find a match first.');
+                return;
+            }
             
-            if (success) {
-                audioSystem?.play('gameStart');
+            // The game should start automatically when match is found
+            // This function might not be needed in the new flow
+            showSuccess('Game starting...');
+            audioSystem?.play('gameStart');
+        }
+        
+        function cancelMatchmaking() {
+            if (socketManager) {
+                socketManager.cancelMatchmaking();
+            }
+            
+            // Reset UI elements
+            const createBtn = document.getElementById('createRoomBtn');
+            const joinBtn = document.getElementById('joinRoomBtn');
+            const joinInput = document.getElementById('joinRoomInput');
+            
+            if (createBtn) {
+                createBtn.disabled = false;
+                createBtn.textContent = '🏠 Create Room';
+            }
+            
+            if (joinBtn) {
+                joinBtn.disabled = false;
+                joinBtn.textContent = '🚺 Join Room';
+            }
+            
+            if (joinInput) {
+                joinInput.disabled = false;
+            }
+            
+            showSuccess('Matchmaking cancelled');
+            audioSystem?.play('menuClick');
+        }
+        
+        function showAuthenticationUI() {
+            // TODO: Create proper login/registration UI
+            const username = prompt('Enter your username:');
+            const password = prompt('Enter your password (or leave empty to register):');
+            
+            if (!username) {
+                showError('Username is required');
+                return;
+            }
+            
+            if (password) {
+                // Login
+                loginUser(username, password);
             } else {
-                showError('Failed to start match. Please ensure both players are connected.');
+                // Register
+                registerUser(username);
+            }
+        }
+        
+        async function loginUser(username, password) {
+            try {
+                const result = await socketManager.login({ username, password });
+                showSuccess('Logged in successfully as ' + result.user.username);
+            } catch (error) {
+                console.error('Login failed:', error);
+                showError('Login failed: ' + error.message);
+            }
+        }
+        
+        async function registerUser(username) {
+            try {
+                const email = username + '@temp.example'; // Temporary email
+                const password = 'temppass123'; // Temporary password
+                
+                const result = await socketManager.register({ 
+                    username, 
+                    email, 
+                    password 
+                });
+                
+                showSuccess('Registered and logged in as ' + result.user.username);
+            } catch (error) {
+                console.error('Registration failed:', error);
+                showError('Registration failed: ' + error.message);
             }
         }
         
@@ -9187,19 +9863,33 @@
         }
         
         function disconnectMultiplayer() {
-            if (multiplayerSystem) {
-                multiplayerSystem.disconnect();
+            if (socketManager) {
+                socketManager.disconnect();
                 
                 // Reset UI
                 document.getElementById('roomInfo').style.display = 'none';
                 document.getElementById('gameReadySection').style.display = 'none';
-                document.getElementById('createRoomBtn').disabled = false;
-                document.getElementById('joinRoomBtn').disabled = false;
-                document.getElementById('joinRoomInput').disabled = false;
-                document.getElementById('roomIdInput').value = '';
-                document.getElementById('joinRoomInput').value = '';
                 
-                showSuccess('Disconnected from multiplayer');
+                const createBtn = document.getElementById('createRoomBtn');
+                const joinBtn = document.getElementById('joinRoomBtn');
+                const joinInput = document.getElementById('joinRoomInput');
+                const roomInput = document.getElementById('roomIdInput');
+                
+                if (createBtn) {
+                    createBtn.disabled = false;
+                    createBtn.textContent = '🏠 Create Room';
+                }
+                
+                if (joinBtn) {
+                    joinBtn.disabled = false;
+                    joinBtn.textContent = '🚺 Join Room';
+                }
+                
+                if (joinInput) joinInput.disabled = false;
+                if (roomInput) roomInput.value = '';
+                if (joinInput) joinInput.value = '';
+                
+                showSuccess('Disconnected from multiplayer server');
                 audioSystem?.play('menuClick');
             }
         }
