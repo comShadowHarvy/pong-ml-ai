@@ -1103,6 +1103,236 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(78,205,196,0.3);
         }
+        
+        /* Authentication Panel Styles */
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(78,205,196,0.2);
+            background: rgba(0,0,0,0.4);
+        }
+        
+        .form-group input:valid {
+            border-color: #4CAF50;
+        }
+        
+        .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+            border-color: var(--secondary-color);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            user-select: none;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        
+        .password-toggle:hover {
+            opacity: 1;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .input-hint {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .quick-play-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* User Profile Section */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .user-details h4 {
+            margin: 0 0 5px 0;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .user-details p {
+            margin: 0;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+        }
+        
+        .user-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Auth Messages */
+        #authMessages {
+            text-align: center;
+        }
+        
+        .auth-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .auth-message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            color: #81C784;
+        }
+        
+        .auth-message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.4);
+            color: #E57373;
+        }
+        
+        .auth-message.info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.4);
+            color: #64B5F6;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Loading states */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+            position: relative;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid var(--primary-color);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile responsiveness for auth */
+        @media (max-width: 768px) {
+            .user-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions .menu-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1152,6 +1382,7 @@
                 </div>
                 
                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
+                    <button class="menu-btn secondary" onclick="showAuthenticationUI()">🔐 Account</button>
                     <button class="menu-btn secondary" onclick="showPanel('settings')">⚙️ Settings</button>
                     <button class="menu-btn secondary" onclick="showPanel('stats')">📊 Statistics</button>
                     <button class="menu-btn secondary" onclick="showPanel('help')">❓ Help</button>
@@ -1642,6 +1873,154 @@
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
                     <button class="menu-btn secondary" onclick="showPanel('help')">❓ Help</button>
                     <button class="menu-btn secondary" onclick="showPanel('menu')">🔙 Back</button>
+                </div>
+            </div>
+            
+            <!-- Authentication Panel -->
+            <div id="authPanel" class="menu-panel" style="display: none;">
+                <div class="nav-breadcrumb">
+                    <span>🏓 Main Menu</span>
+                    <span class="separator">></span>
+                    <span>🔐 Account</span>
+                </div>
+                <div class="menu-header">
+                    <h1 class="menu-title">🔐 Account Login</h1>
+                    <p class="menu-subtitle">Sign in to play online multiplayer</p>
+                </div>
+                
+                <!-- Connection Status -->
+                <div class="connection-status-bar" style="margin-bottom: 20px;">
+                    <div class="status-item">
+                        <span>Server: <span id="authServerStatus">🔄 Connecting...</span></span>
+                    </div>
+                </div>
+                
+                <!-- Auth Form Container -->
+                <div id="authFormContainer">
+                    <!-- Login Form -->
+                    <div id="loginForm" class="auth-form">
+                        <h3 style="color: var(--primary-color); margin-bottom: 20px; text-align: center;">🚪 Sign In</h3>
+                        
+                        <div class="form-group">
+                            <label for="loginUsername">👤 Username:</label>
+                            <input type="text" id="loginUsername" placeholder="Enter your username" maxlength="20" autocomplete="username">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">🔒 Password:</label>
+                            <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+                            <div class="password-toggle" onclick="togglePasswordVisibility('loginPassword')">
+                                <span id="loginPasswordToggle">👁️</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="menu-btn" onclick="performLogin()" id="loginBtn">
+                                <span id="loginBtnText">🔐 Sign In</span>
+                            </button>
+                            <button class="menu-btn secondary" onclick="showRegisterForm()">
+                                📝 Create Account
+                            </button>
+                        </div>
+                        
+                        <div class="quick-play-section">
+                            <p style="text-align: center; margin: 15px 0; opacity: 0.7;">or</p>
+                            <button class="menu-btn secondary" onclick="quickPlayAsGuest()">
+                                🚀 Quick Play as Guest
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Registration Form -->
+                    <div id="registerForm" class="auth-form" style="display: none;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 20px; text-align: center;">📝 Create Account</h3>
+                        
+                        <div class="form-group">
+                            <label for="registerUsername">👤 Username:</label>
+                            <input type="text" id="registerUsername" placeholder="Choose a username" maxlength="20" autocomplete="username">
+                            <div class="input-hint">3-20 characters, letters and numbers only</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerEmail">📧 Email:</label>
+                            <input type="email" id="registerEmail" placeholder="Enter your email" autocomplete="email">
+                            <div class="input-hint">Used for account recovery</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerPassword">🔒 Password:</label>
+                            <input type="password" id="registerPassword" placeholder="Create a password" autocomplete="new-password">
+                            <div class="password-toggle" onclick="togglePasswordVisibility('registerPassword')">
+                                <span id="registerPasswordToggle">👁️</span>
+                            </div>
+                            <div class="input-hint">At least 6 characters</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerPasswordConfirm">🔒 Confirm Password:</label>
+                            <input type="password" id="registerPasswordConfirm" placeholder="Confirm your password" autocomplete="new-password">
+                            <div class="password-toggle" onclick="togglePasswordVisibility('registerPasswordConfirm')">
+                                <span id="registerPasswordConfirmToggle">👁️</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="menu-btn" onclick="performRegistration()" id="registerBtn">
+                                <span id="registerBtnText">📝 Create Account</span>
+                            </button>
+                            <button class="menu-btn secondary" onclick="showLoginForm()">
+                                🔙 Back to Sign In
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- User Profile (shown when logged in) -->
+                    <div id="userProfileSection" class="auth-form" style="display: none;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 20px; text-align: center;">👋 Welcome Back!</h3>
+                        
+                        <div class="user-info">
+                            <div class="user-avatar">👤</div>
+                            <div class="user-details">
+                                <h4 id="currentUserName">Player</h4>
+                                <p id="currentUserEmail">player@example.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="user-stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="userGamesPlayed">0</div>
+                                <div class="stat-label">Games Played</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="userGamesWon">0</div>
+                                <div class="stat-label">Games Won</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="userCurrentRating">1200</div>
+                                <div class="stat-label">Current Rating</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="userWinRate">0%</div>
+                                <div class="stat-label">Win Rate</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="menu-btn" onclick="showPanel('onlineMultiplayer')">
+                                🌐 Play Online
+                            </button>
+                            <button class="menu-btn secondary" onclick="performLogout()">
+                                🚪 Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Error/Success Messages -->
+                <div id="authMessages" style="margin-top: 15px;"></div>
+                
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                    <button class="menu-btn secondary" onclick="showPanel('menu')">🔙 Back to Menu</button>
                 </div>
             </div>
 
@@ -4920,6 +5299,9 @@
                     
                     statusElement.textContent = `${statusEmoji} ${statusText}`;
                 }
+                
+                // Also update auth panel status
+                updateAuthServerStatus();
             }
             
             updateLatencyDisplay() {
@@ -5104,6 +5486,12 @@
                 document.getElementById('onlineGamesPlayed').textContent = user.stats.gamesPlayed || 0;
                 document.getElementById('onlineGamesWon').textContent = user.stats.gamesWon || 0;
                 document.getElementById('playerRating').textContent = user.stats.rating || 1200;
+            }
+            
+            // Also update auth panel if open
+            updateAuthServerStatus();
+            if (document.getElementById('authPanel').style.display !== 'none') {
+                showUserProfile(user);
             }
         }
         
@@ -9893,6 +10281,380 @@
                 audioSystem?.play('menuClick');
             }
         }
+        
+        // ===== AUTHENTICATION FUNCTIONS =====
+        
+        // Enhanced authentication UI function (replaces simple prompt)
+        function showAuthenticationUI() {
+            // Update server status
+            updateAuthServerStatus();
+            
+            // Show the authentication panel
+            showPanel('auth');
+            
+            // Check if user is already logged in
+            checkExistingLogin();
+        }
+        
+        function updateAuthServerStatus() {
+            const statusElement = document.getElementById('authServerStatus');
+            if (statusElement && socketManager) {
+                if (socketManager.isConnected) {
+                    statusElement.innerHTML = '✅ Connected';
+                } else {
+                    statusElement.innerHTML = '🔄 Connecting...';
+                }
+            }
+        }
+        
+        function checkExistingLogin() {
+            const token = localStorage.getItem('authToken');
+            const userData = localStorage.getItem('userData');
+            
+            if (token && userData && socketManager && socketManager.isConnected) {
+                try {
+                    const user = JSON.parse(userData);
+                    showAuthSuccess(`Welcome back, ${user.username}!`);
+                    showUserProfile(user);
+                    
+                    // Try to authenticate with stored token
+                    socketManager.authenticate(token).catch(error => {
+                        console.error('Token validation failed:', error);
+                        clearStoredAuth();
+                        showLoginForm();
+                    });
+                } catch (error) {
+                    console.error('Invalid stored user data:', error);
+                    clearStoredAuth();
+                    showLoginForm();
+                }
+            } else {
+                showLoginForm();
+            }
+        }
+        
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('userProfileSection').style.display = 'none';
+            clearAuthMessages();
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('userProfileSection').style.display = 'none';
+            clearAuthMessages();
+            audioSystem?.play('menuClick');
+        }
+        
+        function showUserProfile(user) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('userProfileSection').style.display = 'block';
+            
+            // Update profile information
+            document.getElementById('currentUserName').textContent = user.username;
+            document.getElementById('currentUserEmail').textContent = user.email || 'No email provided';
+            
+            // Update stats if available
+            if (user.stats) {
+                document.getElementById('userGamesPlayed').textContent = user.stats.gamesPlayed || 0;
+                document.getElementById('userGamesWon').textContent = user.stats.gamesWon || 0;
+                document.getElementById('userCurrentRating').textContent = user.stats.rating || 1200;
+                
+                const winRate = user.stats.gamesPlayed > 0 ? 
+                    Math.round((user.stats.gamesWon / user.stats.gamesPlayed) * 100) : 0;
+                document.getElementById('userWinRate').textContent = winRate + '%';
+            }
+        }
+        
+        async function performLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!validateLoginForm(username, password)) {
+                return;
+            }
+            
+            setLoginLoading(true);
+            clearAuthMessages();
+            
+            try {
+                const result = await socketManager.login({ username, password });
+                
+                // Store authentication data
+                localStorage.setItem('authToken', result.token);
+                localStorage.setItem('userData', JSON.stringify(result.user));
+                
+                showAuthSuccess(`Welcome back, ${result.user.username}!`);
+                showUserProfile(result.user);
+                
+                audioSystem?.play('win');
+            } catch (error) {
+                console.error('Login failed:', error);
+                showAuthError('Login failed: ' + error.message);
+            } finally {
+                setLoginLoading(false);
+            }
+        }
+        
+        async function performRegistration() {
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerPasswordConfirm').value;
+            
+            if (!validateRegistrationForm(username, email, password, confirmPassword)) {
+                return;
+            }
+            
+            setRegisterLoading(true);
+            clearAuthMessages();
+            
+            try {
+                const result = await socketManager.register({ username, email, password });
+                
+                // Store authentication data
+                localStorage.setItem('authToken', result.token);
+                localStorage.setItem('userData', JSON.stringify(result.user));
+                
+                showAuthSuccess(`Account created successfully! Welcome, ${result.user.username}!`);
+                showUserProfile(result.user);
+                
+                audioSystem?.play('win');
+            } catch (error) {
+                console.error('Registration failed:', error);
+                showAuthError('Registration failed: ' + error.message);
+            } finally {
+                setRegisterLoading(false);
+            }
+        }
+        
+        function performLogout() {
+            clearStoredAuth();
+            showAuthSuccess('Signed out successfully!');
+            showLoginForm();
+            audioSystem?.play('menuClick');
+            
+            // Disconnect from multiplayer if connected
+            if (socketManager && socketManager.isConnected) {
+                socketManager.user = null;
+                socketManager.updateUserDisplay();
+            }
+        }
+        
+        function quickPlayAsGuest() {
+            if (!socketManager || !socketManager.isConnected) {
+                showAuthError('Not connected to server. Please try again.');
+                return;
+            }
+            
+            // Generate a temporary guest username
+            const guestName = 'Guest' + Math.floor(Math.random() * 10000);
+            
+            showAuthInfo(`Joining as ${guestName}...`);
+            
+            // Create a temporary user object
+            const guestUser = {
+                id: 'guest_' + Date.now(),
+                username: guestName,
+                email: null,
+                isGuest: true,
+                stats: { gamesPlayed: 0, gamesWon: 0, rating: 1200 }
+            };
+            
+            // Set the user in socket manager
+            socketManager.user = guestUser;
+            socketManager.updateUserDisplay();
+            
+            showAuthSuccess(`Ready to play as ${guestName}!`);
+            showUserProfile(guestUser);
+            
+            audioSystem?.play('gameStart');
+        }
+        
+        function validateLoginForm(username, password) {
+            if (!username) {
+                showAuthError('Please enter your username');
+                document.getElementById('loginUsername').focus();
+                return false;
+            }
+            
+            if (!password) {
+                showAuthError('Please enter your password');
+                document.getElementById('loginPassword').focus();
+                return false;
+            }
+            
+            if (username.length < 3) {
+                showAuthError('Username must be at least 3 characters');
+                document.getElementById('loginUsername').focus();
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function validateRegistrationForm(username, email, password, confirmPassword) {
+            if (!username) {
+                showAuthError('Please enter a username');
+                document.getElementById('registerUsername').focus();
+                return false;
+            }
+            
+            if (username.length < 3 || username.length > 20) {
+                showAuthError('Username must be 3-20 characters long');
+                document.getElementById('registerUsername').focus();
+                return false;
+            }
+            
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showAuthError('Username can only contain letters, numbers, and underscores');
+                document.getElementById('registerUsername').focus();
+                return false;
+            }
+            
+            if (!email) {
+                showAuthError('Please enter an email address');
+                document.getElementById('registerEmail').focus();
+                return false;
+            }
+            
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showAuthError('Please enter a valid email address');
+                document.getElementById('registerEmail').focus();
+                return false;
+            }
+            
+            if (!password) {
+                showAuthError('Please enter a password');
+                document.getElementById('registerPassword').focus();
+                return false;
+            }
+            
+            if (password.length < 6) {
+                showAuthError('Password must be at least 6 characters long');
+                document.getElementById('registerPassword').focus();
+                return false;
+            }
+            
+            if (password !== confirmPassword) {
+                showAuthError('Passwords do not match');
+                document.getElementById('registerPasswordConfirm').focus();
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const toggle = document.getElementById(inputId + 'Toggle');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+        
+        function setLoginLoading(loading) {
+            const button = document.getElementById('loginBtn');
+            const text = document.getElementById('loginBtnText');
+            
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+                text.textContent = 'Signing In...';
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+                text.textContent = '🔐 Sign In';
+            }
+        }
+        
+        function setRegisterLoading(loading) {
+            const button = document.getElementById('registerBtn');
+            const text = document.getElementById('registerBtnText');
+            
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+                text.textContent = 'Creating Account...';
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+                text.textContent = '📝 Create Account';
+            }
+        }
+        
+        function showAuthMessage(message, type = 'info') {
+            const container = document.getElementById('authMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `auth-message ${type}`;
+            messageDiv.textContent = message;
+            
+            // Clear existing messages
+            container.innerHTML = '';
+            container.appendChild(messageDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 5000);
+        }
+        
+        function showAuthSuccess(message) {
+            showAuthMessage(message, 'success');
+        }
+        
+        function showAuthError(message) {
+            showAuthMessage(message, 'error');
+        }
+        
+        function showAuthInfo(message) {
+            showAuthMessage(message, 'info');
+        }
+        
+        function clearAuthMessages() {
+            const container = document.getElementById('authMessages');
+            if (container) {
+                container.innerHTML = '';
+            }
+        }
+        
+        function clearStoredAuth() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+        }
+        
+        // Add keyboard event listeners for auth forms
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login form enter key
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performLogin();
+                    }
+                });
+            }
+            
+            // Register form enter key
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performRegistration();
+                    }
+                });
+            }
+        });
         
         function showSuccess(message) {
             console.log('Success:', message);
