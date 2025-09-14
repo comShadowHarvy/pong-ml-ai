@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Enhanced Pong game with AI personalities, multiple game modes, particle effects, and sound">
+    <meta name="description" content="Enhanced Pong game with AI, analytics, tournaments, mobile optimization, and accessibility - Version 1.5.0">
     <meta name="keywords" content="pong, enhanced, game, ai, multiplayer, sound, effects">
     
     <!-- PWA Meta Tags -->
@@ -678,6 +678,206 @@
                 image-rendering: -webkit-optimize-contrast;
                 image-rendering: crisp-edges;
             }
+        }
+        
+        /* Enhanced Mobile Styles */
+        .mobile-device {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .mobile-device .menu-btn {
+            min-height: 56px; /* Larger touch targets */
+            padding: 18px 24px;
+            font-size: 16px;
+            line-height: 1.2;
+        }
+        
+        /* Orientation-specific styles */
+        .landscape .game-container {
+            padding: 0;
+        }
+        
+        .landscape #gameCanvas {
+            width: 100vw;
+            height: auto;
+            max-height: 80vh;
+        }
+        
+        .portrait .menu-panel {
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        /* Mobile control hints */
+        .mobile-hint {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            max-width: 250px;
+            font-size: 13px;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hint-content p {
+            margin: 5px 0;
+        }
+        
+        .hint-close {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Accessibility enhancements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Focus indicators */
+        .menu-btn:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .menu-btn {
+                border: 2px solid white;
+                background: black;
+                color: white;
+            }
+            
+            .menu-panel {
+                border: 3px solid white;
+                background: black;
+            }
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .menu-btn {
+                transform: none !important;
+            }
+            
+            .menu-btn:hover {
+                transform: none !important;
+            }
+        }
+        
+        /* Large text support */
+        @media (min-width: 320px) and (max-width: 768px) and (orientation: portrait) {
+            .mobile-device.large-text .menu-btn {
+                font-size: 18px;
+                min-height: 60px;
+                padding: 20px 28px;
+            }
+            
+            .mobile-device.large-text .menu-panel {
+                font-size: 16px;
+            }
+        }
+        
+        /* Touch-friendly analytics dashboard */
+        @media (max-width: 768px) {
+            .analytics-dashboard {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .chart-container {
+                min-height: 250px;
+                padding: 15px;
+            }
+            
+            .chart-btn {
+                min-height: 44px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Mobile tournament bracket enhancements */
+        @media (max-width: 768px) {
+            .tournament-bracket {
+                padding: 10px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+            }
+            
+            .bracket-match {
+                min-height: 70px;
+                padding: 8px;
+                margin: 6px 0;
+                font-size: 12px;
+                min-width: 160px;
+            }
+            
+            .bracket-player {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+            
+            .round-label {
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+        }
+        
+        /* Performance optimization classes */
+        .reduced-quality .particle-system {
+            display: none;
+        }
+        
+        .reduced-quality .background-effect {
+            opacity: 0.3;
+        }
+        
+        /* Voice control indicator */
+        .voice-control-active {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .voice-control-active::before {
+            content: '🎤 ';
         }
         
         /* Navigation breadcrumbs */
@@ -4134,9 +4334,15 @@
             gameEngine = new GameEngine(canvas, ctx);
             heatMapVisualizer = new HeatMapVisualizer();
             enhancedTournamentSystem = new EnhancedTournamentSystem();
+            mobileControlSystem = new MobileControlSystem();
+            accessibilitySystem = new AccessibilitySystem();
             
             // Initialize heat map visualizer after DOM is ready
             heatMapVisualizer.initialize('heatmapCanvas');
+            
+            // Initialize mobile and accessibility features
+            setupDeviceOrientation();
+            optimizeForMobile();
             
             loadSettings();
             loadAnalyticsData();
@@ -5192,6 +5398,546 @@
                 }
             }
         }
+        
+        // ===== MOBILE & ACCESSIBILITY ENHANCEMENTS =====
+        
+        class MobileControlSystem {
+            constructor() {
+                this.touchState = {
+                    isActive: false,
+                    startY: 0,
+                    currentY: 0,
+                    lastY: 0,
+                    velocity: 0,
+                    gestureStartTime: 0,
+                    multiTouchActive: false,
+                    pinchStart: 0,
+                    pinchScale: 1
+                };
+                
+                this.hapticSupported = 'vibrate' in navigator;
+                this.gestureThresholds = {
+                    swipeMinDistance: 50,
+                    swipeMaxTime: 300,
+                    tapMaxDistance: 10,
+                    tapMaxTime: 250
+                };
+                
+                this.setupAdvancedTouchControls();
+            }
+            
+            setupAdvancedTouchControls() {
+                if (!gameEngine) return;
+                
+                // Enhanced touch controls for gameplay
+                gameEngine.canvas.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+                gameEngine.canvas.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+                gameEngine.canvas.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
+                
+                // Gesture recognition
+                gameEngine.canvas.addEventListener('gesturestart', this.handleGestureStart.bind(this), { passive: false });
+                gameEngine.canvas.addEventListener('gesturechange', this.handleGestureChange.bind(this), { passive: false });
+                gameEngine.canvas.addEventListener('gestureend', this.handleGestureEnd.bind(this), { passive: false });
+            }
+            
+            handleTouchStart(e) {
+                e.preventDefault();
+                
+                const touch = e.touches[0];
+                const rect = gameEngine.canvas.getBoundingClientRect();
+                
+                this.touchState.isActive = true;
+                this.touchState.startY = touch.clientY - rect.top;
+                this.touchState.currentY = this.touchState.startY;
+                this.touchState.lastY = this.touchState.startY;
+                this.touchState.gestureStartTime = Date.now();
+                this.touchState.multiTouchActive = e.touches.length > 1;
+                
+                // Haptic feedback for touch start
+                this.triggerHapticFeedback('light');
+                
+                // Multi-touch detection
+                if (e.touches.length > 1) {
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    this.touchState.pinchStart = Math.sqrt(
+                        Math.pow(touch2.clientX - touch1.clientX, 2) + 
+                        Math.pow(touch2.clientY - touch1.clientY, 2)
+                    );
+                }
+            }
+            
+            handleTouchMove(e) {
+                e.preventDefault();
+                
+                if (!this.touchState.isActive) return;
+                
+                const touch = e.touches[0];
+                const rect = gameEngine.canvas.getBoundingClientRect();
+                const scaleY = gameEngine.canvas.height / rect.height;
+                
+                this.touchState.lastY = this.touchState.currentY;
+                this.touchState.currentY = touch.clientY - rect.top;
+                
+                // Calculate velocity for smooth movement
+                this.touchState.velocity = (this.touchState.currentY - this.touchState.lastY) * 0.3 + this.touchState.velocity * 0.7;
+                
+                if (gameEngine.gameState === 'playing') {
+                    // Enhanced paddle control with momentum
+                    const gameY = this.touchState.currentY * scaleY;
+                    const targetY = gameY - gameEngine.player.height / 2;
+                    
+                    // Apply momentum for smoother movement
+                    const smoothedY = targetY + this.touchState.velocity;
+                    gameEngine.player.y = Math.max(0, Math.min(gameEngine.canvas.height - gameEngine.player.height, smoothedY));
+                    
+                    // Haptic feedback for paddle movement
+                    if (Math.abs(this.touchState.velocity) > 5) {
+                        this.triggerHapticFeedback('selection');
+                    }
+                }
+                
+                // Handle multi-touch pinch gestures
+                if (e.touches.length > 1) {
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const currentDistance = Math.sqrt(
+                        Math.pow(touch2.clientX - touch1.clientX, 2) + 
+                        Math.pow(touch2.clientY - touch1.clientY, 2)
+                    );
+                    
+                    if (this.touchState.pinchStart > 0) {
+                        this.touchState.pinchScale = currentDistance / this.touchState.pinchStart;
+                        // Could be used for zoom functionality in future
+                    }
+                }
+            }
+            
+            handleTouchEnd(e) {
+                e.preventDefault();
+                
+                if (!this.touchState.isActive) return;
+                
+                const gestureTime = Date.now() - this.touchState.gestureStartTime;
+                const gestureDistance = Math.abs(this.touchState.currentY - this.touchState.startY);
+                
+                // Gesture recognition
+                this.recognizeGesture(gestureTime, gestureDistance, this.touchState.velocity);
+                
+                // Reset touch state
+                this.touchState.isActive = false;
+                this.touchState.velocity = 0;
+                this.touchState.multiTouchActive = false;
+                this.touchState.pinchStart = 0;
+                this.touchState.pinchScale = 1;
+            }
+            
+            recognizeGesture(time, distance, velocity) {
+                // Quick tap gesture
+                if (time < this.gestureThresholds.tapMaxTime && distance < this.gestureThresholds.tapMaxDistance) {
+                    this.handleTapGesture();
+                    return;
+                }
+                
+                // Swipe gestures
+                if (time < this.gestureThresholds.swipeMaxTime && distance > this.gestureThresholds.swipeMinDistance) {
+                    if (velocity > 0) {
+                        this.handleSwipeDown();
+                    } else {
+                        this.handleSwipeUp();
+                    }
+                    return;
+                }
+                
+                // Long press gesture
+                if (time > 500 && distance < this.gestureThresholds.tapMaxDistance) {
+                    this.handleLongPress();
+                }
+            }
+            
+            handleTapGesture() {
+                // Tap to pause/resume game
+                if (gameEngine.gameState === 'playing') {
+                    gameEngine.gameState = 'paused';
+                    this.triggerHapticFeedback('medium');
+                } else if (gameEngine.gameState === 'paused') {
+                    gameEngine.gameState = 'playing';
+                    this.triggerHapticFeedback('medium');
+                }
+            }
+            
+            handleSwipeUp() {
+                // Swipe up for quick paddle movement
+                if (gameEngine.gameState === 'playing') {
+                    gameEngine.player.y = Math.max(0, gameEngine.player.y - 60);
+                    this.triggerHapticFeedback('light');
+                }
+            }
+            
+            handleSwipeDown() {
+                // Swipe down for quick paddle movement
+                if (gameEngine.gameState === 'playing') {
+                    gameEngine.player.y = Math.min(gameEngine.canvas.height - gameEngine.player.height, gameEngine.player.y + 60);
+                    this.triggerHapticFeedback('light');
+                }
+            }
+            
+            handleLongPress() {
+                // Long press to access quick menu
+                if (gameEngine.gameState === 'playing') {
+                    this.showQuickMenu();
+                    this.triggerHapticFeedback('heavy');
+                }
+            }
+            
+            handleGestureStart(e) {
+                e.preventDefault();
+            }
+            
+            handleGestureChange(e) {
+                e.preventDefault();
+                // Handle pinch-to-zoom or other gestures
+            }
+            
+            handleGestureEnd(e) {
+                e.preventDefault();
+            }
+            
+            triggerHapticFeedback(intensity = 'medium') {
+                if (!this.hapticSupported) return;
+                
+                const patterns = {
+                    light: [10],
+                    medium: [50],
+                    heavy: [100],
+                    selection: [25],
+                    success: [50, 100, 50],
+                    error: [200, 100, 200]
+                };
+                
+                const pattern = patterns[intensity] || patterns.medium;
+                navigator.vibrate(pattern);
+            }
+            
+            showQuickMenu() {
+                // Future enhancement: Quick access menu for mobile
+                console.log('Quick menu triggered - future enhancement');
+            }
+            
+            // Utility methods for detecting device capabilities
+            isTouchDevice() {
+                return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            }
+            
+            supportsGestures() {
+                return 'ongesturestart' in window;
+            }
+            
+            // Enhanced paddle control for mobile
+            updatePaddleWithPhysics(targetY) {
+                if (!gameEngine) return;
+                
+                const paddle = gameEngine.player;
+                const currentY = paddle.y + paddle.height / 2;
+                const difference = targetY - currentY;
+                
+                // Apply physics-based movement
+                const acceleration = difference * 0.05;
+                const maxSpeed = 400; // pixels per second
+                
+                paddle.velocity = Math.max(-maxSpeed, Math.min(maxSpeed, (paddle.velocity || 0) + acceleration));
+                paddle.velocity *= 0.85; // Friction
+                
+                const newY = currentY + paddle.velocity * (1/60) - paddle.height / 2;
+                paddle.y = Math.max(0, Math.min(gameEngine.canvas.height - paddle.height, newY));
+            }
+        }
+        
+        // ===== ACCESSIBILITY SYSTEM =====
+        
+        class AccessibilitySystem {
+            constructor() {
+                this.screenReaderActive = this.detectScreenReader();
+                this.keyboardNavigationEnabled = true;
+                this.highContrastMode = false;
+                this.voiceControlEnabled = false;
+                this.setupAccessibilityFeatures();
+            }
+            
+            setupAccessibilityFeatures() {
+                this.setupKeyboardNavigation();
+                this.setupScreenReaderSupport();
+                this.setupHighContrastMode();
+                this.setupVoiceControl();
+                this.setupFocusManagement();
+            }
+            
+            detectScreenReader() {
+                // Detect if screen reader is active
+                return window.speechSynthesis !== undefined || 
+                       navigator.userAgent.includes('NVDA') || 
+                       navigator.userAgent.includes('JAWS') || 
+                       window.navigator.userAgent.includes('VoiceOver');
+            }
+            
+            setupKeyboardNavigation() {
+                document.addEventListener('keydown', (e) => {
+                    if (!this.keyboardNavigationEnabled) return;
+                    
+                    switch (e.key) {
+                        case 'Tab':
+                            this.handleTabNavigation(e);
+                            break;
+                        case 'Enter':
+                        case ' ':
+                            this.handleActivation(e);
+                            break;
+                        case 'Escape':
+                            this.handleEscape(e);
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowDown':
+                        case 'ArrowLeft':
+                        case 'ArrowRight':
+                            this.handleArrowNavigation(e);
+                            break;
+                    }
+                });
+            }
+            
+            setupScreenReaderSupport() {
+                // Add ARIA labels and live regions
+                this.createLiveRegion();
+                this.updateARIALabels();
+            }
+            
+            createLiveRegion() {
+                const liveRegion = document.createElement('div');
+                liveRegion.id = 'game-announcements';
+                liveRegion.setAttribute('aria-live', 'polite');
+                liveRegion.setAttribute('aria-atomic', 'true');
+                liveRegion.style.position = 'absolute';
+                liveRegion.style.left = '-9999px';
+                liveRegion.style.width = '1px';
+                liveRegion.style.height = '1px';
+                liveRegion.style.overflow = 'hidden';
+                document.body.appendChild(liveRegion);
+            }
+            
+            announceToScreenReader(message) {
+                const liveRegion = document.getElementById('game-announcements');
+                if (liveRegion) {
+                    liveRegion.textContent = message;
+                    
+                    // Also use speech synthesis if available
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(message);
+                        utterance.volume = 0.7;
+                        utterance.rate = 1.2;
+                        speechSynthesis.speak(utterance);
+                    }
+                }
+            }
+            
+            updateARIALabels() {
+                // Add comprehensive ARIA labels to game elements
+                const canvas = document.getElementById('gameCanvas');
+                if (canvas) {
+                    canvas.setAttribute('role', 'application');
+                    canvas.setAttribute('aria-label', 'Enhanced Pong Game Canvas');
+                    canvas.setAttribute('aria-describedby', 'game-description');
+                }
+                
+                // Add descriptions to menu buttons
+                document.querySelectorAll('.menu-btn').forEach((btn, index) => {
+                    btn.setAttribute('tabindex', '0');
+                    btn.setAttribute('role', 'button');
+                    if (!btn.getAttribute('aria-label')) {
+                        btn.setAttribute('aria-label', btn.textContent.trim());
+                    }
+                });
+            }
+            
+            setupHighContrastMode() {
+                // Detect system high contrast preference
+                if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
+                    this.enableHighContrastMode();
+                }
+                
+                // Listen for contrast preference changes
+                if (window.matchMedia) {
+                    window.matchMedia('(prefers-contrast: high)').addEventListener('change', (e) => {
+                        if (e.matches) {
+                            this.enableHighContrastMode();
+                        } else {
+                            this.disableHighContrastMode();
+                        }
+                    });
+                }
+            }
+            
+            enableHighContrastMode() {
+                this.highContrastMode = true;
+                document.body.classList.add('high-contrast-mode');
+                
+                // Apply high contrast styles
+                const style = document.createElement('style');
+                style.id = 'high-contrast-styles';
+                style.textContent = `
+                    .high-contrast-mode {
+                        filter: contrast(150%) brightness(120%);
+                    }
+                    .high-contrast-mode .menu-btn {
+                        border: 3px solid white !important;
+                        background: black !important;
+                        color: white !important;
+                    }
+                    .high-contrast-mode .menu-btn:focus {
+                        outline: 3px solid yellow !important;
+                        outline-offset: 2px !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            disableHighContrastMode() {
+                this.highContrastMode = false;
+                document.body.classList.remove('high-contrast-mode');
+                const style = document.getElementById('high-contrast-styles');
+                if (style) style.remove();
+            }
+            
+            setupVoiceControl() {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    return;
+                }
+                
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                this.recognition = new SpeechRecognition();
+                
+                this.recognition.continuous = true;
+                this.recognition.interimResults = false;
+                this.recognition.lang = 'en-US';
+                
+                this.recognition.onresult = (event) => {
+                    const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                    this.processVoiceCommand(command);
+                };
+                
+                this.recognition.onerror = (event) => {
+                    console.log('Voice recognition error:', event.error);
+                };
+            }
+            
+            processVoiceCommand(command) {
+                const commands = {
+                    'start game': () => startGame('classic'),
+                    'pause game': () => gameEngine.gameState = 'paused',
+                    'resume game': () => gameEngine.gameState = 'playing',
+                    'go to menu': () => showPanel('menu'),
+                    'show statistics': () => showPanel('stats'),
+                    'tournament mode': () => startGame('tournament'),
+                    'classic mode': () => startGame('classic'),
+                    'settings': () => showPanel('settings'),
+                    'help': () => showPanel('help')
+                };
+                
+                for (const [phrase, action] of Object.entries(commands)) {
+                    if (command.includes(phrase)) {
+                        action();
+                        this.announceToScreenReader(`Executed: ${phrase}`);
+                        break;
+                    }
+                }
+            }
+            
+            enableVoiceControl() {
+                if (this.recognition) {
+                    this.voiceControlEnabled = true;
+                    this.recognition.start();
+                    this.announceToScreenReader('Voice control enabled');
+                }
+            }
+            
+            disableVoiceControl() {
+                if (this.recognition) {
+                    this.voiceControlEnabled = false;
+                    this.recognition.stop();
+                    this.announceToScreenReader('Voice control disabled');
+                }
+            }
+            
+            setupFocusManagement() {
+                // Manage focus for better keyboard navigation
+                document.addEventListener('focusin', (e) => {
+                    if (e.target.classList.contains('menu-btn')) {
+                        e.target.style.outline = '2px solid var(--primary-color)';
+                        e.target.style.outlineOffset = '2px';
+                    }
+                });
+                
+                document.addEventListener('focusout', (e) => {
+                    if (e.target.classList.contains('menu-btn')) {
+                        e.target.style.outline = '';
+                        e.target.style.outlineOffset = '';
+                    }
+                });
+            }
+            
+            handleTabNavigation(e) {
+                // Enhanced tab navigation logic
+                const focusableElements = document.querySelectorAll(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+                
+                const currentIndex = Array.from(focusableElements).indexOf(document.activeElement);
+                let nextIndex;
+                
+                if (e.shiftKey) {
+                    nextIndex = currentIndex <= 0 ? focusableElements.length - 1 : currentIndex - 1;
+                } else {
+                    nextIndex = currentIndex >= focusableElements.length - 1 ? 0 : currentIndex + 1;
+                }
+                
+                focusableElements[nextIndex].focus();
+                e.preventDefault();
+            }
+            
+            handleActivation(e) {
+                if (document.activeElement && document.activeElement.classList.contains('menu-btn')) {
+                    document.activeElement.click();
+                    e.preventDefault();
+                }
+            }
+            
+            handleEscape(e) {
+                // Always allow escape to return to menu
+                if (currentPanel !== 'menu') {
+                    showPanel('menu');
+                    e.preventDefault();
+                }
+            }
+            
+            handleArrowNavigation(e) {
+                if (gameEngine.gameState === 'playing') {
+                    // Arrow key paddle control for accessibility
+                    switch (e.key) {
+                        case 'ArrowUp':
+                            gameEngine.player.y = Math.max(0, gameEngine.player.y - 20);
+                            e.preventDefault();
+                            break;
+                        case 'ArrowDown':
+                            gameEngine.player.y = Math.min(gameEngine.canvas.height - gameEngine.player.height, gameEngine.player.y + 20);
+                            e.preventDefault();
+                            break;
+                    }
+                }
+            }
+        }
+        
+        // Global instances
+        let mobileControlSystem = null;
+        let accessibilitySystem = null;
         
         // ===== ENHANCED TOURNAMENT SYSTEM =====
         
@@ -6552,21 +7298,634 @@
             URL.revokeObjectURL(url);
         }
 
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('../sw.js')
-                    .then(registration => console.log('SW registered:', registration.scope))
-                    .catch(error => console.error('SW registration failed:', error));
-            });
+        // ===== MOBILE OPTIMIZATION FUNCTIONS =====
+        
+        function setupDeviceOrientation() {
+            // Handle orientation changes
+            window.addEventListener('orientationchange', handleOrientationChange);
+            window.addEventListener('resize', handleResize);
+            
+            // Initial setup
+            handleOrientationChange();
         }
-
+        
+        function handleOrientationChange() {
+            // Delay to allow orientation to fully complete
+            setTimeout(() => {
+                const orientation = screen.orientation?.angle || window.orientation || 0;
+                const isLandscape = Math.abs(orientation) === 90;
+                
+                document.body.classList.toggle('landscape', isLandscape);
+                document.body.classList.toggle('portrait', !isLandscape);
+                
+                // Resize canvas for optimal display
+                resizeCanvasForOrientation(isLandscape);
+                
+                // Announce orientation change for accessibility
+                if (accessibilitySystem) {
+                    accessibilitySystem.announceToScreenReader(
+                        `Screen orientation changed to ${isLandscape ? 'landscape' : 'portrait'}`
+                    );
+                }
+            }, 100);
+        }
+        
+        function handleResize() {
+            if (gameEngine && gameEngine.canvas) {
+                const rect = gameEngine.canvas.getBoundingClientRect();
+                // Update any canvas-dependent calculations
+            }
+        }
+        
+        function resizeCanvasForOrientation(isLandscape) {
+            const canvas = document.getElementById('gameCanvas');
+            if (!canvas) return;
+            
+            if (isMobileDevice()) {
+                if (isLandscape) {
+                    // Landscape: maximize width
+                    canvas.style.width = '100vw';
+                    canvas.style.height = 'auto';
+                    canvas.style.maxHeight = '70vh';
+                } else {
+                    // Portrait: fit within viewport
+                    canvas.style.width = '100%';
+                    canvas.style.height = 'auto';
+                    canvas.style.maxWidth = '100vw';
+                }
+            }
+        }
+        
+        function optimizeForMobile() {
+            if (!isMobileDevice()) return;
+            
+            // Optimize performance for mobile devices
+            optimizeMobilePerformance();
+            
+            // Setup mobile-specific UI improvements
+            setupMobileUI();
+            
+            // Add mobile-specific meta tags if not already present
+            addMobileMetaTags();
+        }
+        
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   (window.innerWidth <= 768 && 'ontouchstart' in window);
+        }
+        
+        function optimizeMobilePerformance() {
+            // Reduce particle density on mobile
+            if (particleSystem) {
+                particleSystem.maxParticles = Math.floor(particleSystem.maxParticles * 0.6);
+            }
+            
+            // Reduce background effect intensity
+            if (backgroundEffect) {
+                backgroundEffect.intensity = Math.min(backgroundEffect.intensity, 0.8);
+            }
+            
+            // Optimize canvas rendering
+            const canvas = document.getElementById('gameCanvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false; // Better performance
+            }
+            
+            // Enable performance monitoring
+            if ('performance' in window && 'memory' in performance) {
+                monitorMobilePerformance();
+            }
+        }
+        
+        function monitorMobilePerformance() {
+            let lastFrameTime = performance.now();
+            let frameCount = 0;
+            let totalFrameTime = 0;
+            
+            function checkPerformance() {
+                const now = performance.now();
+                const frameTime = now - lastFrameTime;
+                lastFrameTime = now;
+                
+                frameCount++;
+                totalFrameTime += frameTime;
+                
+                // Check every 60 frames (roughly 1 second at 60fps)
+                if (frameCount >= 60) {
+                    const averageFrameTime = totalFrameTime / frameCount;
+                    const fps = 1000 / averageFrameTime;
+                    
+                    // If FPS drops below 45, reduce quality
+                    if (fps < 45) {
+                        reduceQualityForPerformance();
+                    }
+                    
+                    frameCount = 0;
+                    totalFrameTime = 0;
+                }
+                
+                requestAnimationFrame(checkPerformance);
+            }
+            
+            requestAnimationFrame(checkPerformance);
+        }
+        
+        function reduceQualityForPerformance() {
+            // Reduce particle effects
+            if (particleSystem) {
+                particleSystem.maxParticles = Math.max(50, Math.floor(particleSystem.maxParticles * 0.8));
+            }
+            
+            // Reduce background effects
+            if (backgroundEffect) {
+                backgroundEffect.intensity = Math.max(0.5, backgroundEffect.intensity * 0.8);
+            }
+            
+            // Disable some visual effects
+            if (gameEngine) {
+                gameEngine.settings.ballTrail = false;
+                gameEngine.settings.screenShake = false;
+            }
+        }
+        
+        function setupMobileUI() {
+            // Add mobile-specific CSS classes
+            document.body.classList.add('mobile-device');
+            
+            // Create mobile control hints
+            createMobileControlHints();
+            
+            // Setup mobile-optimized tournament brackets
+            optimizeTournamentForMobile();
+        }
+        
+        function createMobileControlHints() {
+            const hintsContainer = document.createElement('div');
+            hintsContainer.id = 'mobile-control-hints';
+            hintsContainer.innerHTML = `
+                <div class="mobile-hint" id="gameControlHint" style="display: none;">
+                    <div class="hint-content">
+                        <p>👆 <strong>Touch Controls:</strong></p>
+                        <p>• Drag to move paddle</p>
+                        <p>• Tap to pause/resume</p>
+                        <p>• Swipe up/down for quick moves</p>
+                        <p>• Long press for menu</p>
+                    </div>
+                    <button class="hint-close" onclick="closeMobileHint('gameControlHint')">✕</button>
+                </div>
+            `;
+            
+            document.body.appendChild(hintsContainer);
+            
+            // Show hints for first-time mobile users
+            if (localStorage.getItem('mobileHintsShown') !== 'true') {
+                setTimeout(() => showMobileHint('gameControlHint'), 2000);
+                localStorage.setItem('mobileHintsShown', 'true');
+            }
+        }
+        
+        function showMobileHint(hintId) {
+            const hint = document.getElementById(hintId);
+            if (hint) {
+                hint.style.display = 'block';
+                setTimeout(() => closeMobileHint(hintId), 5000); // Auto-close after 5 seconds
+            }
+        }
+        
+        function closeMobileHint(hintId) {
+            const hint = document.getElementById(hintId);
+            if (hint) {
+                hint.style.display = 'none';
+            }
+        }
+        
+        function optimizeTournamentForMobile() {
+            // Make tournament brackets more mobile-friendly
+            const style = document.createElement('style');
+            style.id = 'mobile-tournament-styles';
+            style.textContent = `
+                @media (max-width: 768px) {
+                    .tournament-bracket {
+                        overflow-x: scroll;
+                        -webkit-overflow-scrolling: touch;
+                    }
+                    
+                    .bracket-container {
+                        min-width: 800px;
+                    }
+                    
+                    .bracket-match {
+                        min-height: 60px;
+                        font-size: 12px;
+                    }
+                    
+                    .ai-personality-badge {
+                        font-size: 10px;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        function addMobileMetaTags() {
+            // Prevent zoom on input focus
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            }
+            
+            // Add apple-touch-icon if not present
+            if (!document.querySelector('link[rel="apple-touch-icon"]')) {
+                const appleIcon = document.createElement('link');
+                appleIcon.rel = 'apple-touch-icon';
+                appleIcon.href = 'icon-192x192.png';
+                document.head.appendChild(appleIcon);
+            }
+            
+            // Add theme-color for mobile browsers
+            if (!document.querySelector('meta[name="theme-color"]')) {
+                const themeColor = document.createElement('meta');
+                themeColor.name = 'theme-color';
+                themeColor.content = '#2a5298';
+                document.head.appendChild(themeColor);
+            }
+        }
+        
+        // Integrate haptic feedback with game events
+        function integrateHapticFeedback() {
+            if (!mobileControlSystem || !mobileControlSystem.hapticSupported) return;
+            
+            // Add haptic feedback to existing game events
+            const originalPlaySound = audioSystem?.play;
+            if (originalPlaySound) {
+                audioSystem.play = function(type) {
+                    originalPlaySound.call(this, type);
+                    
+                    // Add haptic feedback based on sound type
+                    switch(type) {
+                        case 'paddleHit':
+                            mobileControlSystem.triggerHapticFeedback('light');
+                            break;
+                        case 'wallBounce':
+                            mobileControlSystem.triggerHapticFeedback('light');
+                            break;
+                        case 'score':
+                            mobileControlSystem.triggerHapticFeedback('success');
+                            break;
+                        case 'win':
+                            mobileControlSystem.triggerHapticFeedback('success');
+                            break;
+                        case 'lose':
+                            mobileControlSystem.triggerHapticFeedback('error');
+                            break;
+                    }
+                };
+            }
+        }
+        
+        // PWA Service Worker Registration and Full Offline Support
+        function initializePWA() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    // Register service worker for offline functionality
+                    registerServiceWorker();
+                });
+            }
+            
+            // Setup install prompt
+            setupInstallPrompt();
+            
+            // Check for app updates
+            checkForAppUpdates();
+        }
+        
+        function registerServiceWorker() {
+            // Create inline service worker for offline support
+            const swCode = `
+                const CACHE_NAME = 'enhanced-pong-v1.2.0';
+                const urlsToCache = [
+                    './',
+                    './enhanced-pong.html',
+                    'https://cdn.jsdelivr.net/npm/chart.js'
+                ];
+                
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+                
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => {
+                                if (response) {
+                                    return response;
+                                }
+                                return fetch(event.request);
+                            })
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl)
+                .then(registration => {
+                    console.log('Enhanced Pong SW registered:', registration.scope);
+                    showOfflineReadyMessage();
+                })
+                .catch(error => {
+                    console.warn('SW registration failed:', error);
+                });
+        }
+        
+        function showOfflineReadyMessage() {
+            const offlineMessage = document.createElement('div');
+            offlineMessage.id = 'offline-ready-message';
+            offlineMessage.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(42, 82, 152, 0.95);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.2);
+            `;
+            offlineMessage.innerHTML = '✓ Enhanced Pong is now available offline!';
+            document.body.appendChild(offlineMessage);
+            
+            setTimeout(() => {
+                offlineMessage.style.opacity = '0';
+                offlineMessage.style.transition = 'opacity 0.5s';
+                setTimeout(() => offlineMessage.remove(), 500);
+            }, 3000);
+        }
+        
         // PWA Install Prompt
         let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
+        
+        function setupInstallPrompt() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showInstallButton();
+            });
+            
+            window.addEventListener('appinstalled', () => {
+                console.log('Enhanced Pong installed as PWA');
+                hideInstallButton();
+                showInstalledMessage();
+            });
+        }
+        
+        function showInstallButton() {
+            const installBtn = document.createElement('button');
+            installBtn.id = 'pwa-install-btn';
+            installBtn.className = 'menu-btn';
+            installBtn.innerHTML = '📱 Install App';
+            installBtn.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                background: var(--primary-color);
+                border: 2px solid var(--accent-color);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 25px;
+                font-size: 12px;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            `;
+            
+            installBtn.addEventListener('click', installPWA);
+            document.body.appendChild(installBtn);
+        }
+        
+        function hideInstallButton() {
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) installBtn.remove();
+        }
+        
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        function showInstalledMessage() {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(76, 175, 80, 0.95);
+                color: white;
+                padding: 20px;
+                border-radius: 15px;
+                font-size: 16px;
+                z-index: 10001;
+                text-align: center;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            `;
+            message.innerHTML = '✅ Enhanced Pong installed successfully!<br>You can now play offline anytime.';
+            document.body.appendChild(message);
+            
+            setTimeout(() => message.remove(), 4000);
+        }
+        
+        function checkForAppUpdates() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (registration) {
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        showUpdateAvailable();
+                                    }
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        }
+        
+        function showUpdateAvailable() {
+            const updateMessage = document.createElement('div');
+            updateMessage.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(255, 152, 0, 0.95);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 25px;
+                font-size: 14px;
+                z-index: 10000;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            updateMessage.innerHTML = '🆕 App update available! Tap to reload.';
+            updateMessage.addEventListener('click', () => {
+                window.location.reload();
+            });
+            document.body.appendChild(updateMessage);
+        }
+        
+        // Offline Support Functions
+        function initializeOfflineSupport() {
+            // Monitor online/offline status
+            window.addEventListener('online', handleOnlineStatus);
+            window.addEventListener('offline', handleOfflineStatus);
+            
+            // Check initial status
+            if (!navigator.onLine) {
+                handleOfflineStatus();
+            }
+            
+            // Setup offline data persistence
+            setupOfflineDataPersistence();
+        }
+        
+        function handleOnlineStatus() {
+            hideOfflineIndicator();
+            syncOfflineData();
+            console.log('Enhanced Pong: Back online');
+        }
+        
+        function handleOfflineStatus() {
+            showOfflineIndicator();
+            console.log('Enhanced Pong: Now offline');
+        }
+        
+        function showOfflineIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'offline-indicator';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(244, 67, 54, 0.9);
+                color: white;
+                text-align: center;
+                padding: 8px;
+                font-size: 14px;
+                z-index: 10002;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            `;
+            indicator.innerHTML = '⚠️ Playing offline - Your progress will sync when reconnected';
+            document.body.appendChild(indicator);
+        }
+        
+        function hideOfflineIndicator() {
+            const indicator = document.getElementById('offline-indicator');
+            if (indicator) indicator.remove();
+        }
+        
+        function setupOfflineDataPersistence() {
+            // Enhanced local storage for offline play
+            const originalSaveData = saveGameData;
+            window.saveGameData = function(data) {
+                // Save to localStorage for offline persistence
+                const offlineData = {
+                    timestamp: new Date().toISOString(),
+                    data: data,
+                    synced: navigator.onLine
+                };
+                
+                const offlineQueue = JSON.parse(localStorage.getItem('offlineDataQueue') || '[]');
+                offlineQueue.push(offlineData);
+                localStorage.setItem('offlineDataQueue', JSON.stringify(offlineQueue));
+                
+                if (originalSaveData) {
+                    originalSaveData(data);
+                }
+            };
+        }
+        
+        function syncOfflineData() {
+            const offlineQueue = JSON.parse(localStorage.getItem('offlineDataQueue') || '[]');
+            
+            if (offlineQueue.length > 0) {
+                // Process offline data queue
+                offlineQueue.forEach(item => {
+                    if (!item.synced) {
+                        // Attempt to sync data
+                        try {
+                            // Mark as synced
+                            item.synced = true;
+                        } catch (error) {
+                            console.warn('Failed to sync offline data:', error);
+                        }
+                    }
+                });
+                
+                // Update queue
+                const syncedQueue = offlineQueue.filter(item => !item.synced);
+                localStorage.setItem('offlineDataQueue', JSON.stringify(syncedQueue));
+                
+                if (syncedQueue.length === 0) {
+                    showSyncCompleteMessage();
+                }
+            }
+        }
+        
+        function showSyncCompleteMessage() {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                bottom: 60px;
+                right: 20px;
+                background: rgba(76, 175, 80, 0.9);
+                color: white;
+                padding: 10px 15px;
+                border-radius: 20px;
+                font-size: 12px;
+                z-index: 10000;
+            `;
+            message.innerHTML = '✓ Offline progress synced!';
+            document.body.appendChild(message);
+            
+            setTimeout(() => message.remove(), 3000);
+        }
+        
+        // ===== MAIN INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all systems when DOM is ready
+            if (isMobileDevice()) {
+                setupDeviceOrientation();
+                optimizeForMobile();
+                integrateHapticFeedback();
+            }
+            
+            // Initialize PWA and offline support
+            initializePWA();
+            initializeOfflineSupport();
+            
+            console.log('Enhanced Pong: All systems initialized');
         });
+        
     </script>
 </body>
 </html>

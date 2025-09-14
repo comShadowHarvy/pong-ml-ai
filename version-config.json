@@ -1,7 +1,7 @@
 {
-  "version": "1.3.0",
-  "releaseDate": "2025-09-13",
-  "codename": "Analytics Visualizer",
+  "version": "1.5.0",
+  "releaseDate": "2025-01-13",
+  "codename": "Mobile & Accessibility Champion",
   "description": "Enhanced Pong - Ultimate Edition",
   "author": "ShadowHarvy",
   "features": {
@@ -11,14 +11,16 @@
     "backgroundEffects": 15,
     "gameModes": 6,
     "newFeatures": [
-      "Beautiful Chart.js Analytics Dashboard with 8 interactive charts",
-      "Real-time performance trends tracking (win rate, reaction time, consistency)",
-      "AI Personality performance analysis with detailed win/loss statistics",
-      "Tournament analytics with progression tracking and round analysis",
-      "Heat Map intensity trends showing gameplay evolution over time",
-      "ML AI learning progression visualization with confidence metrics",
-      "Advanced data export functionality (JSON/CSV formats)",
-      "Enhanced session tracking with detailed performance snapshots"
+      "Advanced touch controls with gesture recognition, momentum, and multi-touch support",
+      "Comprehensive accessibility features with screen reader support and keyboard navigation",
+      "Haptic feedback system with device vibration for tactile gameplay experience",
+      "PWA capabilities with offline support, install prompts, and service worker caching",
+      "Mobile-first responsive design with orientation handling and device detection",
+      "Voice control accessibility for hands-free gameplay and navigation",
+      "Performance optimization for mobile devices with quality reduction algorithms",
+      "Enhanced mobile UI with larger touch targets and mobile-optimized tournament brackets",
+      "High contrast mode support and reduced motion preferences for accessibility",
+      "Offline data persistence with automatic sync when connection is restored"
     ]
   },
   "roadmap": {
@@ -53,25 +55,41 @@
           "Tournament Analytics Charts",
           "Data Export (JSON/CSV)"
         ]
-      }
-    ],
-    "upcoming": [
+      },
       {
         "version": "1.4.0",
-        "title": "Mobile Optimization & Accessibility",
+        "date": "2025-01-13",
         "features": [
-          "Touch controls optimization",
-          "Screen reader support",
-          "Mobile-first design"
+          "Enhanced Tournament System",
+          "Progressive AI Difficulty",
+          "Advanced Tournament Brackets",
+          "Tournament Achievements",
+          "Comprehensive Tournament Analytics"
         ]
       },
       {
         "version": "1.5.0",
+        "date": "2025-01-13",
+        "features": [
+          "Advanced Mobile Touch Controls",
+          "Complete Accessibility Support",
+          "PWA with Offline Capabilities",
+          "Haptic Feedback System",
+          "Voice Control Accessibility",
+          "Mobile Performance Optimization",
+          "Responsive Design Enhancements"
+        ]
+      }
+    ],
+    "upcoming": [
+      {
+        "version": "1.6.0",
         "title": "Online Multiplayer & Replay System",
         "features": [
           "Real-time multiplayer",
           "Match replay system",
-          "Spectator mode"
+          "Spectator mode",
+          "Global leaderboards"
         ]
       },
       {

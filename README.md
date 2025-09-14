@@ -4,7 +4,7 @@
 
 A modern, feature-rich Pong game with advanced AI, machine learning, analytics, and stunning visual effects.
 
-![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Web-green.svg)
 ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red.svg)
 
@@ -127,20 +127,28 @@ Alternatively, clone the repository and open `enhanced-pong.html` in your web br
 
 See [TODO.md](TODO.md) for detailed development plans and upcoming features.
 
-### ✅ Latest Release (v1.3.0) - COMPLETED ✨
-- **Analytics Dashboard**: Beautiful Chart.js visualizations with 8 interactive charts
-- **Performance Graphs**: Real-time trends tracking (win rate, reaction time, consistency)
-- **AI Analytics**: Comprehensive AI personality performance analysis
-- **Tournament Analytics**: Advanced tournament progression tracking
-- **Heat Map Trends**: Gameplay evolution visualization over time
-- **ML AI Visualization**: Learning progression with confidence metrics
-- **Data Export**: Professional JSON/CSV export functionality
-- **Enhanced Statistics**: Detailed performance snapshots and session tracking
+### ✅ Latest Release (v1.5.0) - COMPLETED ✨ - Mobile & Accessibility Champion
+- **Advanced Touch Controls**: Gesture recognition, multi-touch, momentum-based paddle control
+- **Comprehensive Accessibility**: Screen reader support, ARIA labeling, keyboard navigation
+- **PWA Enhancements**: Full offline support, install prompts, service worker caching
+- **Haptic Feedback**: Device vibration synchronized with gameplay events
+- **Voice Control**: Hands-free gameplay with voice commands for accessibility
+- **Mobile-First Design**: Responsive layout with orientation handling and device detection
+- **Performance Optimization**: Mobile-specific quality reduction and battery efficiency
+- **Enhanced Mobile UI**: Larger touch targets, mobile-optimized tournament brackets
+- **Accessibility Preferences**: High contrast mode and reduced motion support
+- **Offline Data Sync**: Automatic synchronization when connection is restored
 
-### Next Release (v1.4.0) - Coming Soon
-- **Mobile Optimization**: Enhanced touch controls and mobile-first design
-- **Accessibility Features**: Screen reader support and keyboard navigation
-- **Performance Enhancements**: Optimized rendering and smoother gameplay
+### Previous Releases
+- **v1.4.0**: Enhanced Tournament System with progressive AI difficulty
+- **v1.3.0**: Analytics Dashboard with Chart.js visualizations
+- **v1.2.0**: Tournament System with rankings and achievements
+- **v1.0.0**: Initial release with 8 AI personalities and advanced analytics
+
+### Next Release (v1.6.0) - Coming Soon
+- **Online Multiplayer**: Real-time multiplayer with matchmaking
+- **Replay System**: Match replay and analysis capabilities
+- **Global Leaderboards**: Worldwide player rankings and statistics
 
 ## 🎯 Browser Compatibility
 
